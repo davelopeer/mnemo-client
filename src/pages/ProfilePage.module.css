@@ -1,0 +1,114 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+}
+
+.tabs {
+  display: inline-flex;
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-ink-100);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  gap: 2px;
+  align-self: flex-start;
+}
+
+.tab {
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink-500);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.tab:hover {
+  color: var(--color-ink-900);
+}
+
+.tabActive {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.tabActive:hover {
+  color: #fff;
+}
+
+.posts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
+}
+
+@media (max-width: 880px) {
+  .posts {
+    grid-template-columns: 1fr;
+  }
+}
+
+.about {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--spacing-4);
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-ink-100);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+}
+
+.about h3 {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-ink-300);
+  margin-bottom: var(--spacing-2);
+}
+
+.about p {
+  font-size: 15px;
+  color: var(--color-ink-700);
+  line-height: 1.6;
+}
+
+.interestList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.interestList li {
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-muted);
+  color: var(--color-ink-500);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.interestActive {
+  background-color: var(--color-primary-tint) !important;
+  color: var(--color-primary) !important;
+}
+
+.emptyState {
+  padding: var(--spacing-7);
+  text-align: center;
+  background-color: var(--color-surface-raised);
+  border: 1px dashed var(--color-ink-100);
+  border-radius: var(--radius-lg);
+}
+
+.emptyState h3 {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.emptyState p {
+  color: var(--color-ink-500);
+  font-size: 14px;
+  margin-top: 6px;
+}

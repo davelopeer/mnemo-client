@@ -1,0 +1,91 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: rgba(251, 249, 245, 0.85);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--color-ink-100);
+}
+
+.inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  height: var(--nav-height);
+  padding: 0 var(--spacing-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-5);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brandMark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--color-primary), #3a0708);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.brandName {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-ink-900);
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.link {
+  position: relative;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink-700);
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.link:hover {
+  background-color: var(--color-surface-muted);
+  color: var(--color-ink-900);
+}
+
+.linkActive {
+  color: var(--color-primary);
+  background-color: var(--color-primary-tint);
+}
+
+.logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink-500);
+  padding: 8px 14px;
+  border-left: 1px solid var(--color-ink-100);
+  margin-left: var(--spacing-2);
+  padding-left: var(--spacing-4);
+}
+
+.logout:hover {
+  color: var(--color-primary);
+}

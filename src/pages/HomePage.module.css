@@ -1,0 +1,73 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: var(--spacing-5);
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  min-width: 0;
+}
+
+.feedHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--color-ink-100);
+}
+
+.feedHeader h1 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.feedHeader p {
+  font-size: 14px;
+  color: var(--color-ink-500);
+  margin-top: 2px;
+}
+
+.feedCount {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-500);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.empty {
+  padding: var(--spacing-7) var(--spacing-5);
+  text-align: center;
+  background-color: var(--color-surface-raised);
+  border: 1px dashed var(--color-ink-100);
+  border-radius: var(--radius-lg);
+}
+
+.empty h3 {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.empty p {
+  font-size: 14px;
+  color: var(--color-ink-500);
+  margin-top: 6px;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

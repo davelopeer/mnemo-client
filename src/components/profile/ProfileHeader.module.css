@@ -1,0 +1,81 @@
+.wrapper {
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-ink-100);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.cover {
+  height: 140px;
+  background:
+    radial-gradient(600px 200px at 20% 20%, rgba(123, 17, 19, 0.45), transparent 70%),
+    radial-gradient(500px 200px at 80% 40%, rgba(31, 72, 126, 0.45), transparent 70%),
+    linear-gradient(135deg, #2a1615, #1f2f47);
+}
+
+.content {
+  padding: 0 var(--spacing-5) var(--spacing-5);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--spacing-5);
+  align-items: flex-end;
+  margin-top: -56px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 8px;
+}
+
+.name {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.nickname {
+  font-size: 14px;
+  color: var(--color-ink-500);
+}
+
+.bio {
+  font-size: 14px;
+  color: var(--color-ink-700);
+  max-width: 60ch;
+  margin-top: 4px;
+}
+
+.interests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.interest {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  background-color: var(--color-surface-muted);
+  border-radius: var(--radius-pill);
+  color: var(--color-ink-700);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-2);
+  padding-bottom: 8px;
+}
+
+@media (max-width: 720px) {
+  .content {
+    grid-template-columns: 1fr;
+    margin-top: -40px;
+  }
+
+  .actions {
+    justify-content: flex-start;
+  }
+}

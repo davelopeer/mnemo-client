@@ -1,0 +1,32 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.02em;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.positive {
+  background-color: rgba(62, 86, 65, 0.12);
+  color: var(--color-forest);
+}
+
+.neutral {
+  background-color: rgba(165, 144, 126, 0.2);
+  color: #6e5a48;
+}
+
+.negative {
+  background-color: rgba(123, 17, 19, 0.1);
+  color: var(--color-primary);
+}

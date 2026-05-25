@@ -1,0 +1,9 @@
+Se coloque no papel de um engenheiro de software sênior.
+
+Quero criar uma aplicação em react que seria uma rede social com base no summary.md na pasta mnemo/client.
+
+Ignore as lógicas de login ou qualquer uma que dependa do backend. Foque no design e na implementação do design visual da página. Deixe o código bem limpo e as responsábilidades separadas. Evite comentários no código, preferindo nomes mais explicitos de variáveis e funcões.
+
+Depois, me de uma explicação detalhada de como o código funciona num arquivo, pensando que eu tenho pouca experiẽncia com frontend (e nada com react). Quero entender o que foi feito.
+
+

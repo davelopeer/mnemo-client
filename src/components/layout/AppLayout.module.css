@@ -1,0 +1,30 @@
+.shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(1000px 500px at 10% -10%, var(--color-primary-tint), transparent 70%),
+    radial-gradient(800px 400px at 110% 10%, rgba(31, 72, 126, 0.08), transparent 70%),
+    var(--color-surface);
+}
+
+.body {
+  flex: 1;
+  max-width: var(--content-max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--spacing-5);
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  gap: var(--spacing-5);
+}
+
+.main {
+  min-width: 0;
+}
+
+@media (max-width: 960px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+}
