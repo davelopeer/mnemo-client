@@ -1,4 +1,7 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { resolveApiAssetUrl } from '../../api/client.js';
+import * as profileApi from '../../api/profile.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import Avatar from '../ui/Avatar.jsx';
 import Button from '../ui/Button.jsx';
@@ -7,25 +10,48 @@ import { currentUser } from '../../data/mockData.js';
 import styles from './Sidebar.module.css';
 
 const sidebarLinks = [
-  { to: '/perfil', label: 'Meu perfil', icon: 'user' },
+  { to: '/profile', label: 'Meu perfil', icon: 'user' },
   { to: '/amigos', label: 'Amigos', icon: 'friends' }
 ];
 
 function Sidebar() {
+  const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const displayName = user ? `${user.firstName} ${user.lastName}` : currentUser.name;
-  const displayEmail = user?.email ?? currentUser.nickname;
+  const { token, user } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const displayName = profile?.displayName ?? (user ? `${user.firstName} ${user.lastName}` : currentUser.name);
+  const displayUsername = profile?.username ? `@${profile.username}` : (user?.email ?? currentUser.nickname);
+  const avatarUrl = resolveApiAssetUrl(profile?.profileImageUrl);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadProfile() {
+      if (!token) {
+        return;
+      }
+
+      const data = await profileApi.getMyProfile(token).catch(() => null);
+      if (isMounted) {
+        setProfile(data);
+      }
+    }
+
+    loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [token, location.pathname]);
 
   return (
     <aside className={styles.sidebar}>
       <section className={styles.userCard}>
-        <Avatar src={currentUser.avatarUrl} alt={displayName} size="lg" ring />
+        <Avatar src={avatarUrl} alt={displayName} size="lg" ring />
         <div className={styles.userMeta}>
           <h3 className={styles.userName}>{displayName}</h3>
-          <span className={styles.userNickname}>{displayEmail}</span>
+          <span className={styles.userNickname}>{displayUsername}</span>
         </div>
-        <p className={styles.userBio}>{currentUser.bio}</p>
 
         <div className={styles.stats}>
           <div className={styles.stat}>

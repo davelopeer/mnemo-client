@@ -35,12 +35,6 @@
   color: var(--color-ink-500);
 }
 
-.userBio {
-  font-size: 13px;
-  color: var(--color-ink-700);
-  line-height: 1.45;
-}
-
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
