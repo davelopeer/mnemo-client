@@ -3,7 +3,7 @@ import CategoryTag from '../ui/CategoryTag.jsx';
 import RecommendationBadge from '../ui/RecommendationBadge.jsx';
 import styles from './PostCard.module.css';
 
-function PostCard({ post }) {
+function PostCard({ post, canManage = false, onEdit, onDelete }) {
   return (
     <article className={styles.card}>
       <header className={styles.header}>
@@ -39,9 +39,28 @@ function PostCard({ post }) {
           <button className={styles.actionButton} type="button">
             Compartilhar
           </button>
-          <button className={styles.actionButton} type="button">
-            Salvar
-          </button>
+          {canManage ? (
+            <>
+              <button
+                className={styles.actionButton}
+                type="button"
+                onClick={() => onEdit?.(post)}
+              >
+                Editar
+              </button>
+              <button
+                className={`${styles.actionButton} ${styles.deleteButton}`}
+                type="button"
+                onClick={() => onDelete?.(post)}
+              >
+                Deletar
+              </button>
+            </>
+          ) : (
+            <button className={styles.actionButton} type="button">
+              Salvar
+            </button>
+          )}
         </footer>
       </div>
     </article>

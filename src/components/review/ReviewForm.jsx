@@ -11,27 +11,60 @@ const toneClassMap = {
   negative: styles.optionNegative
 };
 
-function ReviewForm({ onSubmit, onCancel }) {
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState(MEDIA_CATEGORIES[0].id);
-  const [recommendation, setRecommendation] = useState('');
-  const [body, setBody] = useState('');
+function ReviewForm({
+  onSubmit,
+  onCancel,
+  isSubmitting = false,
+  errorMessage = '',
+  mode = 'create',
+  initialValues = null
+}) {
+  const isEdit = mode === 'edit';
+  const [title, setTitle] = useState(initialValues?.mediaTitle ?? '');
+  const [mediaAuthor, setMediaAuthor] = useState(initialValues?.mediaAuthor ?? '');
+  const [mediaYear, setMediaYear] = useState(
+    initialValues?.mediaYear != null ? String(initialValues.mediaYear) : ''
+  );
+  const [category, setCategory] = useState(initialValues?.category ?? MEDIA_CATEGORIES[0].id);
+  const [recommendation, setRecommendation] = useState(initialValues?.recommendation ?? '');
+  const [body, setBody] = useState(initialValues?.body ?? '');
+  const [photo, setPhoto] = useState(null);
 
   const remainingCharacters = MAX_REVIEW_LENGTH - body.length;
   const isOverLimit = remainingCharacters < 0;
-  const canSubmit = title.trim().length > 0 && body.trim().length > 0 && !isOverLimit;
+  const canSubmit =
+    title.trim().length > 0 &&
+    mediaAuthor.trim().length > 0 &&
+    mediaYear.trim().length > 0 &&
+    recommendation.trim().length > 0 &&
+    body.trim().length > 0 &&
+    (isEdit || Boolean(photo)) &&
+    !isOverLimit &&
+    !isSubmitting;
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!canSubmit) return;
-    onSubmit({ title, category, recommendation, body });
+    onSubmit({
+      mediaTitle: title,
+      mediaAuthor,
+      mediaYear,
+      category,
+      recommendation,
+      body,
+      photo
+    });
   };
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <header className={styles.header}>
-        <h1>Nova review</h1>
-        <p>Compartilhe com seus amigos o que você anda consumindo.</p>
+        <h1>{isEdit ? 'Editar review' : 'Nova review'}</h1>
+        <p>
+          {isEdit
+            ? 'Atualize os detalhes da sua review.'
+            : 'Compartilhe com seus amigos o que você anda consumindo.'}
+        </p>
       </header>
 
       <div className={styles.grid}>
@@ -41,7 +74,7 @@ function ReviewForm({ onSubmit, onCancel }) {
             id="review-title"
             className={styles.input}
             type="text"
-            placeholder="Ex: Neuromancer — William Gibson"
+            placeholder="Ex: Neuromancer"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
           />
@@ -61,6 +94,33 @@ function ReviewForm({ onSubmit, onCancel }) {
               </option>
             ))}
           </select>
+        </div>
+      </div>
+
+      <div className={styles.grid}>
+        <div className={styles.field}>
+          <label htmlFor="review-author">Autor da obra</label>
+          <input
+            id="review-author"
+            className={styles.input}
+            type="text"
+            placeholder="Ex: William Gibson"
+            value={mediaAuthor}
+            onChange={(event) => setMediaAuthor(event.target.value)}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="review-year">Ano da obra</label>
+          <input
+            id="review-year"
+            className={styles.input}
+            type="number"
+            inputMode="numeric"
+            placeholder="Ex: 1984"
+            value={mediaYear}
+            onChange={(event) => setMediaYear(event.target.value)}
+          />
         </div>
       </div>
 
@@ -86,6 +146,22 @@ function ReviewForm({ onSubmit, onCancel }) {
       </div>
 
       <div className={styles.field}>
+        <label htmlFor="review-photo">Foto da review</label>
+        <input
+          id="review-photo"
+          className={styles.input}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={(event) => setPhoto(event.target.files?.[0] ?? null)}
+        />
+        <p className={styles.helperText}>
+          {isEdit
+            ? 'Opcional. Envie uma nova imagem para substituir a atual. JPG, PNG ou WEBP com até 5 MB.'
+            : 'Obrigatória. Use JPG, PNG ou WEBP com até 5 MB.'}
+        </p>
+      </div>
+
+      <div className={styles.field}>
         <label htmlFor="review-body">Sua review</label>
         <textarea
           id="review-body"
@@ -103,12 +179,24 @@ function ReviewForm({ onSubmit, onCancel }) {
         </div>
       </div>
 
+      {errorMessage && (
+        <p className={styles.errorMessage} role="alert">
+          {errorMessage}
+        </p>
+      )}
+
       <footer className={styles.actions}>
-        <Button type="button" variant="ghost" onClick={onCancel}>
+        <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
           Cancelar
         </Button>
         <Button type="submit" variant="primary" disabled={!canSubmit}>
-          Publicar review
+          {isEdit
+            ? isSubmitting
+              ? 'Salvando...'
+              : 'Salvar alterações'
+            : isSubmitting
+              ? 'Publicando...'
+              : 'Publicar review'}
         </Button>
       </footer>
     </form>

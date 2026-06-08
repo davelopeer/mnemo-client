@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { resolveApiAssetUrl } from '../api/client.js';
 import * as profileApi from '../api/profile.js';
+import * as reviewsApi from '../api/reviews.js';
 import { useAuth } from '../auth/AuthContext.jsx';
 import ProfileHeader from '../components/profile/ProfileHeader.jsx';
 import PostCard from '../components/feed/PostCard.jsx';
-import { currentUser, userPosts, MEDIA_CATEGORIES } from '../data/mockData.js';
+import ReviewForm from '../components/review/ReviewForm.jsx';
+import { currentUser, MEDIA_CATEGORIES } from '../data/mockData.js';
 import styles from './ProfilePage.module.css';
 
 const profileTabs = [
@@ -28,14 +30,69 @@ function profileToUser(profile, fallbackUser) {
   };
 }
 
+const relativeTimeFormatter = new Intl.RelativeTimeFormat('pt-BR', { numeric: 'auto' });
+
+function formatPostedAt(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  const diffSeconds = Math.round((date.getTime() - Date.now()) / 1000);
+  const ranges = [
+    { limit: 60, unit: 'second', seconds: 1 },
+    { limit: 3600, unit: 'minute', seconds: 60 },
+    { limit: 86400, unit: 'hour', seconds: 3600 },
+    { limit: 2592000, unit: 'day', seconds: 86400 },
+    { limit: 31536000, unit: 'month', seconds: 2592000 },
+    { limit: Infinity, unit: 'year', seconds: 31536000 }
+  ];
+  const range = ranges.find((item) => Math.abs(diffSeconds) < item.limit);
+
+  return relativeTimeFormatter.format(Math.round(diffSeconds / range.seconds), range.unit);
+}
+
+function reviewToPost(review) {
+  const workMetadata = [review.mediaAuthor, review.mediaYear].filter(Boolean).join(', ');
+
+  return {
+    id: review.id,
+    author: {
+      name: review.author.displayName,
+      nickname: review.author.username ? `@${review.author.username}` : 'Username ainda não definido',
+      avatarUrl: resolveApiAssetUrl(review.author.profileImageUrl)
+    },
+    category: review.category,
+    title: review.mediaTitle,
+    subtitle: workMetadata || review.mediaSubtitle || '',
+    coverUrl: resolveApiAssetUrl(review.photoUrl),
+    recommendation: review.recommendation,
+    postedAt: formatPostedAt(review.createdAt),
+    body: review.body,
+    editValues: {
+      mediaTitle: review.mediaTitle,
+      mediaAuthor: review.mediaAuthor,
+      mediaYear: review.mediaYear,
+      category: review.category,
+      recommendation: review.recommendation,
+      body: review.body
+    }
+  };
+}
+
 function ProfilePage() {
   const { username } = useParams();
   const navigate = useNavigate();
   const { token, user } = useAuth();
   const [activeTab, setActiveTab] = useState('posts');
   const [profile, setProfile] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [status, setStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
+  const [editingPost, setEditingPost] = useState(null);
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
+  const [editErrorMessage, setEditErrorMessage] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
   const isOwnProfile = !username;
 
   useEffect(() => {
@@ -46,12 +103,16 @@ function ProfilePage() {
       setErrorMessage('');
 
       try {
-        const data = username
-          ? await profileApi.getProfileByUsername(username)
-          : await profileApi.getMyProfile(token);
+        const [profileData, reviewsData] = username
+          ? await Promise.all([
+              profileApi.getProfileByUsername(username),
+              reviewsApi.getProfileReviews(username)
+            ])
+          : await Promise.all([profileApi.getMyProfile(token), reviewsApi.getMyProfileReviews(token)]);
 
         if (isMounted) {
-          setProfile(data);
+          setProfile(profileData);
+          setReviews((reviewsData.items ?? []).map(reviewToPost));
           setStatus('success');
         }
       } catch (error) {
@@ -68,6 +129,59 @@ function ProfilePage() {
       isMounted = false;
     };
   }, [token, username]);
+
+  const handleDeletePost = async (post) => {
+    if (deletingId) {
+      return;
+    }
+    const confirmed = window.confirm('Tem certeza que deseja deletar esta review? Essa ação não pode ser desfeita.');
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingId(post.id);
+    try {
+      await reviewsApi.deleteReview(token, post.id);
+      setReviews((previous) => previous.filter((item) => item.id !== post.id));
+    } catch (error) {
+      window.alert(error.message);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleEditPost = (post) => {
+    setEditErrorMessage('');
+    setEditingPost(post);
+  };
+
+  const handleCloseEdit = () => {
+    if (isSubmittingEdit) {
+      return;
+    }
+    setEditingPost(null);
+    setEditErrorMessage('');
+  };
+
+  const handleSubmitEdit = async (payload) => {
+    if (!editingPost) {
+      return;
+    }
+    setIsSubmittingEdit(true);
+    setEditErrorMessage('');
+    try {
+      const updated = await reviewsApi.updateReview(token, editingPost.id, payload);
+      const updatedPost = reviewToPost(updated);
+      setReviews((previous) =>
+        previous.map((item) => (item.id === updatedPost.id ? updatedPost : item))
+      );
+      setEditingPost(null);
+    } catch (error) {
+      setEditErrorMessage(error.message);
+    } finally {
+      setIsSubmittingEdit(false);
+    }
+  };
 
   const fallbackUser = useMemo(
     () =>
@@ -123,11 +237,30 @@ function ProfilePage() {
       </nav>
 
       {activeTab === 'posts' && (
-        <section className={styles.posts}>
-          {userPosts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
-        </section>
+        <>
+          {reviews.length > 0 ? (
+            <section className={styles.posts}>
+              {reviews.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  canManage={isOwnProfile}
+                  onEdit={handleEditPost}
+                  onDelete={handleDeletePost}
+                />
+              ))}
+            </section>
+          ) : (
+            <section className={styles.emptyState}>
+              <h3>Nenhuma review por aqui ainda.</h3>
+              <p>
+                {isOwnProfile
+                  ? 'Publique sua primeira review para montar seu histórico.'
+                  : 'Este perfil ainda não publicou reviews.'}
+              </p>
+            </section>
+          )}
+        </>
       )}
 
       {activeTab === 'about' && (
@@ -159,6 +292,26 @@ function ProfilePage() {
           <h3>Coleções chegam em breve.</h3>
           <p>Você poderá agrupar reviews em temas — tipo “cyberpunk dos anos 80”.</p>
         </section>
+      )}
+
+      {editingPost && (
+        <div
+          className={styles.modalOverlay}
+          role="dialog"
+          aria-modal="true"
+          onClick={handleCloseEdit}
+        >
+          <div className={styles.modalContent} onClick={(event) => event.stopPropagation()}>
+            <ReviewForm
+              mode="edit"
+              initialValues={editingPost.editValues}
+              onSubmit={handleSubmitEdit}
+              onCancel={handleCloseEdit}
+              isSubmitting={isSubmittingEdit}
+              errorMessage={editErrorMessage}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
