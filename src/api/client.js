@@ -27,10 +27,16 @@ export async function apiRequest(path, { method = 'GET', body, token } = {}) {
   return data;
 }
 
-export function resolveApiAssetUrl(path) {
+export function resolveApiAssetUrl(path, cacheKey) {
   if (!path || path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }
 
-  return `${API_BASE_URL}${path}`;
+  const url = `${API_BASE_URL}${path}`;
+  if (!cacheKey) {
+    return url;
+  }
+
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}v=${encodeURIComponent(cacheKey)}`;
 }

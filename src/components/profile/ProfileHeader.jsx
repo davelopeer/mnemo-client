@@ -6,11 +6,8 @@ import styles from './ProfileHeader.module.css';
 function ProfileHeader({ user, isOwnProfile = false, onEdit }) {
   return (
     <section className={styles.wrapper}>
-      <div className={styles.cover} aria-hidden="true" />
       <div className={styles.content}>
-        <div className={styles.avatarFrame}>
-          <Avatar src={user.avatarUrl} alt={user.name} size="xl" ring />
-        </div>
+        <Avatar src={user.avatarUrl} alt={user.name} size="xl" ring />
         <div className={styles.info}>
           <h1 className={styles.name}>{user.name}</h1>
           <span className={styles.nickname}>{user.nickname}</span>

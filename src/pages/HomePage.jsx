@@ -1,15 +1,88 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PostCard from '../components/feed/PostCard.jsx';
 import FeedFilters from '../components/feed/FeedFilters.jsx';
-import { feedPosts, MEDIA_CATEGORIES, RECOMMENDATION_TYPES } from '../data/mockData.js';
+import * as feedApi from '../api/feed.js';
+import { useAuth } from '../auth/AuthContext.jsx';
+import { reviewToPost } from '../utils/reviewPost.js';
 import styles from './HomePage.module.css';
 
-const allCategoryIds = MEDIA_CATEGORIES.map((item) => item.id);
-const allRecommendationIds = RECOMMENDATION_TYPES.map((item) => item.id);
-
 function HomePage() {
-  const [selectedCategories, setSelectedCategories] = useState(allCategoryIds);
-  const [selectedRecommendations, setSelectedRecommendations] = useState(allRecommendationIds);
+  const { token } = useAuth();
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedRecommendations, setSelectedRecommendations] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [status, setStatus] = useState('loading');
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const loadMoreRef = useRef(null);
+
+  const fetchFeed = useCallback(
+    async ({ nextOffset = 0, append = false } = {}) => {
+      if (!token) {
+        return;
+      }
+
+      if (append) {
+        setIsLoadingMore(true);
+      } else {
+        setStatus('loading');
+        setErrorMessage('');
+      }
+
+      try {
+        const response = await feedApi.getFriendsFeed(token, {
+          offset: nextOffset,
+          categories: selectedCategories,
+          recommendations: selectedRecommendations
+        });
+
+        const mappedPosts = (response.items ?? []).map(reviewToPost);
+
+        setPosts((previous) => (append ? [...previous, ...mappedPosts] : mappedPosts));
+        setOffset(nextOffset + mappedPosts.length);
+        setHasMore(Boolean(response.hasMore));
+        setStatus('success');
+      } catch (error) {
+        if (append) {
+          setErrorMessage(error.message);
+        } else {
+          setPosts([]);
+          setOffset(0);
+          setHasMore(false);
+          setStatus('error');
+          setErrorMessage(error.message);
+        }
+      } finally {
+        setIsLoadingMore(false);
+      }
+    },
+    [selectedCategories, selectedRecommendations, token]
+  );
+
+  useEffect(() => {
+    fetchFeed({ nextOffset: 0, append: false });
+  }, [fetchFeed]);
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target || !hasMore || status !== 'success' || isLoadingMore) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          fetchFeed({ nextOffset: offset, append: true });
+        }
+      },
+      { rootMargin: '240px 0px' }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [fetchFeed, hasMore, isLoadingMore, offset, status]);
 
   const toggleCategory = (categoryId) => {
     setSelectedCategories((previous) =>
@@ -27,13 +100,8 @@ function HomePage() {
     );
   };
 
-  const visiblePosts = useMemo(() => {
-    return feedPosts.filter(
-      (post) =>
-        selectedCategories.includes(post.category) &&
-        selectedRecommendations.includes(post.recommendation)
-    );
-  }, [selectedCategories, selectedRecommendations]);
+  const hasActiveFilters =
+    selectedCategories.length > 0 || selectedRecommendations.length > 0;
 
   return (
     <div className={styles.layout}>
@@ -44,17 +112,52 @@ function HomePage() {
             <p>O que seus amigos andam lendo, vendo e jogando.</p>
           </div>
           <span className={styles.feedCount}>
-            {visiblePosts.length} {visiblePosts.length === 1 ? 'post' : 'posts'}
+            {posts.length} {posts.length === 1 ? 'post' : 'posts'}
           </span>
         </header>
 
         <div className={styles.posts}>
-          {visiblePosts.length > 0 ? (
-            visiblePosts.map((post) => <PostCard key={post.id} post={post} />)
-          ) : (
+          {status === 'loading' && (
+            <div className={styles.empty} aria-live="polite">
+              <h3>Carregando feed...</h3>
+              <p>Buscando as reviews mais recentes dos seus amigos.</p>
+            </div>
+          )}
+
+          {status === 'error' && (
+            <div className={styles.empty} aria-live="assertive">
+              <h3>Não foi possível carregar o feed.</h3>
+              <p>{errorMessage}</p>
+            </div>
+          )}
+
+          {status === 'success' && posts.length > 0 && posts.map((post) => <PostCard key={post.id} post={post} />)}
+
+          {status === 'success' && posts.length === 0 && (
             <div className={styles.empty}>
-              <h3>Nenhum post bate com esses filtros.</h3>
-              <p>Tente reativar algumas categorias ou tipos de review.</p>
+              {hasActiveFilters ? (
+                <>
+                  <h3>Nenhum post bate com esses filtros.</h3>
+                  <p>Tente marcar outras categorias ou tipos de review.</p>
+                </>
+              ) : (
+                <>
+                  <h3>Nenhum post por aqui ainda.</h3>
+                  <p>Quando seus amigos publicarem reviews, elas aparecerão aqui.</p>
+                </>
+              )}
+            </div>
+          )}
+
+          {status === 'success' && hasMore && (
+            <div ref={loadMoreRef} className={styles.loadMore} aria-live="polite">
+              {isLoadingMore ? 'Carregando mais posts...' : 'Role para carregar mais'}
+            </div>
+          )}
+
+          {status === 'success' && errorMessage && (
+            <div className={styles.empty} aria-live="assertive">
+              <p>{errorMessage}</p>
             </div>
           )}
         </div>

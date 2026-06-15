@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { resolveApiAssetUrl } from '../../api/client.js';
+import * as friendsApi from '../../api/friends.js';
 import * as profileApi from '../../api/profile.js';
+import * as reviewsApi from '../../api/reviews.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import Avatar from '../ui/Avatar.jsx';
 import Button from '../ui/Button.jsx';
@@ -10,6 +12,7 @@ import { currentUser } from '../../data/mockData.js';
 import styles from './Sidebar.module.css';
 
 const sidebarLinks = [
+  { to: '/home', label: 'Home', icon: 'home' },
   { to: '/profile', label: 'Meu perfil', icon: 'user' },
   { to: '/amigos', label: 'Amigos', icon: 'friends' }
 ];
@@ -19,6 +22,8 @@ function Sidebar() {
   const navigate = useNavigate();
   const { token, user } = useAuth();
   const [profile, setProfile] = useState(null);
+  const [friendsCount, setFriendsCount] = useState(0);
+  const [postsCount, setPostsCount] = useState(0);
   const displayName = profile?.displayName ?? (user ? `${user.firstName} ${user.lastName}` : currentUser.name);
   const displayUsername = profile?.username ? `@${profile.username}` : (user?.email ?? currentUser.nickname);
   const avatarUrl = resolveApiAssetUrl(profile?.profileImageUrl);
@@ -26,18 +31,25 @@ function Sidebar() {
   useEffect(() => {
     let isMounted = true;
 
-    async function loadProfile() {
+    async function loadSidebarData() {
       if (!token) {
         return;
       }
 
-      const data = await profileApi.getMyProfile(token).catch(() => null);
+      const [profileData, friendsData, reviewsData] = await Promise.all([
+        profileApi.getMyProfile(token).catch(() => null),
+        friendsApi.listFriends(token).catch(() => ({ items: [] })),
+        reviewsApi.getMyProfileReviews(token).catch(() => ({ items: [] }))
+      ]);
+
       if (isMounted) {
-        setProfile(data);
+        setProfile(profileData);
+        setFriendsCount(friendsData?.items?.length ?? 0);
+        setPostsCount(reviewsData?.items?.length ?? 0);
       }
     }
 
-    loadProfile();
+    loadSidebarData();
 
     return () => {
       isMounted = false;
@@ -55,15 +67,11 @@ function Sidebar() {
 
         <div className={styles.stats}>
           <div className={styles.stat}>
-            <strong>{currentUser.stats.memories}</strong>
-            <span>memórias</span>
-          </div>
-          <div className={styles.stat}>
-            <strong>{currentUser.stats.friends}</strong>
+            <strong>{friendsCount}</strong>
             <span>amigos</span>
           </div>
           <div className={styles.stat}>
-            <strong>{currentUser.stats.posts}</strong>
+            <strong>{postsCount}</strong>
             <span>posts</span>
           </div>
         </div>
