@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import Avatar from '../ui/Avatar.jsx';
 import Button from '../ui/Button.jsx';
+import Icon from '../ui/Icon.jsx';
 import styles from './FriendCard.module.css';
 
 function profileToCardData(profile) {
@@ -19,8 +20,11 @@ function FriendCard({
   profile,
   relationshipStatus,
   requestId,
+  friendshipId,
   onAddFriend,
   onAcceptFriend,
+  onRejectFriend,
+  onRemoveFriend,
   isActionLoading = false,
   variant = 'friend'
 }) {
@@ -34,9 +38,21 @@ function FriendCard({
     navigate(`/user/${friend.username}`);
   }
 
-  function renderPrimaryAction() {
+  function renderSecondaryActions() {
     if (variant === 'friend') {
-      return null;
+      return (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className={styles.iconButton}
+          aria-label="Excluir amizade"
+          disabled={isActionLoading || !friendshipId}
+          onClick={() => onRemoveFriend?.(friendshipId, friend)}
+        >
+          <Icon name="trash" size={16} />
+        </Button>
+      );
     }
 
     if (relationshipStatus === 'friends') {
@@ -57,14 +73,25 @@ function FriendCard({
 
     if (relationshipStatus === 'pending_received') {
       return (
-        <Button
-          variant="primary"
-          size="sm"
-          disabled={isActionLoading || !requestId}
-          onClick={() => onAcceptFriend?.(requestId)}
-        >
-          Aceitar amizade
-        </Button>
+        <>
+          <Button
+            variant="outline"
+            size="sm"
+            className={styles.rejectButton}
+            disabled={isActionLoading || !requestId}
+            onClick={() => onRejectFriend?.(requestId)}
+          >
+            Rejeitar
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            disabled={isActionLoading || !requestId}
+            onClick={() => onAcceptFriend?.(requestId)}
+          >
+            Aceitar amizade
+          </Button>
+        </>
       );
     }
 
@@ -88,8 +115,8 @@ function FriendCard({
         <span className={styles.nickname}>{friend.nickname}</span>
       </div>
       <div className={styles.actions}>
-        {renderPrimaryAction()}
         <Button
+          type="button"
           variant="secondary"
           size="sm"
           disabled={!friend.username}
@@ -97,6 +124,7 @@ function FriendCard({
         >
           Ver perfil
         </Button>
+        {renderSecondaryActions()}
       </div>
     </article>
   );

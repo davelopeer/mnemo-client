@@ -93,8 +93,8 @@ export function AuthProvider({ children }) {
   );
 
   const signUp = useCallback(
-    async (payload) => {
-      const response = await authApi.signup(payload);
+    async (payload, avatarFile) => {
+      const response = await authApi.signup(payload, avatarFile);
       return handleAuthResponse(response);
     },
     [handleAuthResponse]

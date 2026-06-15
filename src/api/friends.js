@@ -29,3 +29,17 @@ export function acceptFriendRequest(token, requestId) {
     token
   });
 }
+
+export function rejectFriendRequest(token, requestId) {
+  return apiRequest(`${FRIENDS_API_BASE}/requests/${requestId}/reject`, {
+    method: 'POST',
+    token
+  });
+}
+
+export function removeFriendship(token, friendshipId) {
+  return apiRequest(`${FRIENDS_API_BASE}/${friendshipId}`, {
+    method: 'DELETE',
+    token
+  });
+}

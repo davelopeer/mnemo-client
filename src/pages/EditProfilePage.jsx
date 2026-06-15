@@ -12,7 +12,7 @@ const usernamePattern = /^[a-zA-Z0-9_-]+$/;
 
 function validateUsername(username) {
   if (!username) {
-    return '';
+    return 'Informe um username.';
   }
   if (username.startsWith('@')) {
     return 'Informe o username sem @.';
@@ -100,7 +100,7 @@ function EditProfilePage() {
 
     try {
       const updatedProfile = await profileApi.updateMyProfile(token, {
-        username: normalizedUsername || null,
+        username: normalizedUsername,
         description: description.trim() || null
       });
       let nextProfile = updatedProfile;
@@ -118,25 +118,6 @@ function EditProfilePage() {
       } else {
         setFormError(error.message);
       }
-    }
-  }
-
-  async function handleRemoveAvatar() {
-    setFormError('');
-    setAvatarMessage('');
-
-    if (avatarFile) {
-      setAvatarFile(null);
-      return;
-    }
-
-    try {
-      const updatedProfile = await profileApi.removeMyAvatar(token);
-      setProfile(updatedProfile);
-      setAvatarFile(null);
-      setAvatarMessage('Foto removida com sucesso.');
-    } catch (error) {
-      setFormError(error.message);
     }
   }
 
@@ -188,9 +169,9 @@ function EditProfilePage() {
             onChange={(event) => setAvatarFile(event.target.files?.[0] ?? null)}
           />
           <span className={styles.helpText}>JPEG, PNG ou WEBP com até 5 MB.</span>
-          {profile?.profileImageUrl || avatarFile ? (
-            <Button type="button" variant="ghost" size="sm" onClick={handleRemoveAvatar}>
-              Remover foto
+          {avatarFile ? (
+            <Button type="button" variant="ghost" size="sm" onClick={() => setAvatarFile(null)}>
+              Cancelar nova foto
             </Button>
           ) : null}
           {avatarMessage ? <p className={styles.successMessage}>{avatarMessage}</p> : null}
@@ -206,6 +187,7 @@ function EditProfilePage() {
             value={username}
             maxLength={30}
             placeholder="ana_vieira"
+            required
             onChange={(event) => {
               setUsername(event.target.value);
               setUsernameError('');

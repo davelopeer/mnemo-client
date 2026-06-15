@@ -1,8 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
+import Avatar from '../components/ui/Avatar.jsx';
 import Button from '../components/ui/Button.jsx';
 import styles from './LoginPage.module.css';
+
+const usernamePattern = /^[a-zA-Z0-9_-]+$/;
+
+function validateUsername(username) {
+  if (!username) {
+    return 'Informe um username.';
+  }
+  if (username.startsWith('@')) {
+    return 'Informe o username sem @.';
+  }
+  if (username.length < 3 || username.length > 30) {
+    return 'O username deve ter entre 3 e 30 caracteres.';
+  }
+  if (!usernamePattern.test(username)) {
+    return 'Use apenas letras, números, hífen e underline.';
+  }
+  return '';
+}
 
 function SignupPage() {
   const navigate = useNavigate();
@@ -13,30 +32,79 @@ function SignupPage() {
     email: '',
     password: '',
     phone: '',
-    age: ''
+    age: '',
+    username: ''
   });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
   const [error, setError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [avatarError, setAvatarError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!avatarFile) {
+      setPreviewUrl('');
+      return undefined;
+    }
+
+    const objectUrl = URL.createObjectURL(avatarFile);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [avatarFile]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((current) => ({ ...current, [name]: value }));
+    if (name === 'username') {
+      setUsernameError('');
+    }
+  };
+
+  const handleAvatarChange = (event) => {
+    setAvatarFile(event.target.files?.[0] ?? null);
+    setAvatarError('');
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
+    setUsernameError('');
+    setAvatarError('');
+
+    const normalizedUsername = formData.username.trim().toLowerCase();
+    const nextUsernameError = validateUsername(normalizedUsername);
+    if (nextUsernameError) {
+      setUsernameError(nextUsernameError);
+      return;
+    }
+
+    if (!avatarFile) {
+      setAvatarError('Selecione uma foto de perfil.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      await signUp({
-        ...formData,
-        age: Number(formData.age),
-        phone: formData.phone.trim() || undefined
-      });
+      await signUp(
+        {
+          ...formData,
+          username: normalizedUsername,
+          age: Number(formData.age),
+          phone: formData.phone.trim() || undefined
+        },
+        avatarFile
+      );
       navigate('/home', { replace: true });
     } catch (err) {
-      setError(err.message);
+      if (err.message.toLowerCase().includes('username')) {
+        setUsernameError(err.message);
+      } else if (err.message.toLowerCase().includes('imagem') || err.message.toLowerCase().includes('avatar')) {
+        setAvatarError(err.message);
+      } else {
+        setError(err.message);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -107,6 +175,47 @@ function SignupPage() {
               required
             />
           </label>
+
+          <label className={styles.field} htmlFor="username">
+            <span>Username</span>
+            <input
+              id="username"
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              maxLength={30}
+              placeholder="ana_vieira"
+              autoComplete="username"
+              required
+              aria-describedby={usernameError ? 'username-error' : undefined}
+              aria-invalid={Boolean(usernameError)}
+            />
+            {usernameError ? (
+              <span id="username-error" className={styles.errorMessage} role="alert">
+                {usernameError}
+              </span>
+            ) : null}
+          </label>
+
+          <section className={styles.avatarSection}>
+            <Avatar src={previewUrl} alt="Prévia da foto de perfil" size="lg" ring />
+            <label className={styles.field} htmlFor="avatar">
+              <span>Foto de perfil</span>
+              <input
+                id="avatar"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleAvatarChange}
+                required
+              />
+              {avatarError ? (
+                <span className={styles.errorMessage} role="alert">
+                  {avatarError}
+                </span>
+              ) : null}
+            </label>
+          </section>
 
           <div className={styles.fieldGrid}>
             <label className={styles.field}>

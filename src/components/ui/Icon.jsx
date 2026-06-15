@@ -12,7 +12,8 @@ const iconPaths = {
   tv: 'M3 6h18v12H3zM8 22h8M12 18v4',
   gamepad: 'M6 12h4M8 10v4M15 11h.01M17 13h.01M4 8h16a2 2 0 0 1 2 2v4a4 4 0 0 1-7.2 2.4l-1.3-1.7h-3l-1.3 1.7A4 4 0 0 1 2 14v-4a2 2 0 0 1 2-2z',
   sparkle: 'M12 2l2 5 5 2-5 2-2 5-2-5-5-2 5-2z',
-  mail: 'M3 6h18v12H3zM3 6l9 7 9-7'
+  mail: 'M3 6h18v12H3zM3 6l9 7 9-7',
+  trash: 'M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-7 4v6m4-6v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12'
 };
 
 function Icon({ name, size = 18, strokeWidth = 1.8, filled = false, className }) {

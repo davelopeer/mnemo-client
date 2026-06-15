@@ -177,3 +177,60 @@
   color: var(--color-ink-500);
   margin-top: 4px;
 }
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-5);
+  background-color: rgba(27, 26, 23, 0.55);
+}
+
+.modalContent {
+  width: min(100%, 420px);
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-ink-100);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-5);
+}
+
+.modalTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modalText {
+  margin-top: var(--spacing-3);
+  font-size: 14px;
+  color: var(--color-ink-700);
+  line-height: 1.5;
+}
+
+.modalError {
+  margin-top: var(--spacing-3);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background-color: #fdecec;
+  color: #9b1c1c;
+  font-size: 13px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
+}
+
+.modalConfirmButton {
+  background-color: #9b1c1c;
+}
+
+.modalConfirmButton:not(:disabled):hover {
+  background-color: #7f1616;
+}

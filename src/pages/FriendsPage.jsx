@@ -3,6 +3,7 @@ import { resolveApiAssetUrl } from '../api/client.js';
 import * as friendsApi from '../api/friends.js';
 import { useAuth } from '../auth/AuthContext.jsx';
 import FriendCard from '../components/friends/FriendCard.jsx';
+import Button from '../components/ui/Button.jsx';
 import Icon from '../components/ui/Icon.jsx';
 import styles from './FriendsPage.module.css';
 
@@ -32,6 +33,8 @@ function FriendsPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [actionKey, setActionKey] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [friendToRemove, setFriendToRemove] = useState(null);
+  const [removeErrorMessage, setRemoveErrorMessage] = useState('');
 
   const loadFriends = useCallback(async () => {
     if (!token) {
@@ -174,6 +177,67 @@ function FriendsPage() {
     }
   }
 
+  async function handleRejectFriend(requestId) {
+    if (!token || !requestId) {
+      return;
+    }
+
+    setActionKey(`reject:${requestId}`);
+    setErrorMessage('');
+    try {
+      await friendsApi.rejectFriendRequest(token, requestId);
+      await loadPendingRequests();
+      if (activeTab === 'discover' && searchQuery.trim().length >= 2) {
+        const response = await friendsApi.searchUsers(token, searchQuery.trim());
+        setSearchResults(response.items.map((item) => ({
+          ...item,
+          profile: normalizeProfileImage(item.profile)
+        })));
+      }
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setActionKey(null);
+    }
+  }
+
+  function handleOpenRemoveModal(friendshipId, friendProfile) {
+    setRemoveErrorMessage('');
+    setFriendToRemove({
+      friendshipId,
+      displayName: friendProfile.name,
+      username: friendProfile.username
+    });
+  }
+
+  function handleCloseRemoveModal() {
+    if (actionKey?.startsWith('remove:')) {
+      return;
+    }
+    setFriendToRemove(null);
+    setRemoveErrorMessage('');
+  }
+
+  async function handleConfirmRemoveFriendship() {
+    if (!token || !friendToRemove?.friendshipId) {
+      return;
+    }
+
+    const { friendshipId } = friendToRemove;
+    setActionKey(`remove:${friendshipId}`);
+    setRemoveErrorMessage('');
+    try {
+      await friendsApi.removeFriendship(token, friendshipId);
+      setFriendToRemove(null);
+      await loadFriends();
+      setErrorMessage('');
+    } catch (error) {
+      setRemoveErrorMessage(error.message);
+    } finally {
+      setActionKey(null);
+    }
+  }
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -234,7 +298,14 @@ function FriendsPage() {
               </div>
             ) : filteredFriends.length > 0 ? (
               filteredFriends.map((friend) => (
-                <FriendCard key={friend.friendshipId} profile={friend.profile} variant="friend" />
+                <FriendCard
+                  key={friend.friendshipId}
+                  profile={friend.profile}
+                  friendshipId={friend.friendshipId}
+                  variant="friend"
+                  isActionLoading={actionKey === `remove:${friend.friendshipId}`}
+                  onRemoveFriend={handleOpenRemoveModal}
+                />
               ))
             ) : (
               <div className={styles.empty}>
@@ -281,9 +352,14 @@ function FriendsPage() {
                       relationshipStatus={item.relationshipStatus}
                       requestId={item.requestId}
                       variant="search"
-                      isActionLoading={actionKey === `add:${item.profile.username}` || actionKey === `accept:${item.requestId}`}
+                      isActionLoading={
+                        actionKey === `add:${item.profile.username}`
+                        || actionKey === `accept:${item.requestId}`
+                        || actionKey === `reject:${item.requestId}`
+                      }
                       onAddFriend={handleAddFriend}
                       onAcceptFriend={handleAcceptFriend}
+                      onRejectFriend={handleRejectFriend}
                     />
                   ))
                 ) : (
@@ -321,8 +397,12 @@ function FriendsPage() {
                     relationshipStatus="pending_received"
                     requestId={item.requestId}
                     variant="search"
-                    isActionLoading={actionKey === `accept:${item.requestId}`}
+                    isActionLoading={
+                      actionKey === `accept:${item.requestId}`
+                      || actionKey === `reject:${item.requestId}`
+                    }
                     onAcceptFriend={handleAcceptFriend}
+                    onRejectFriend={handleRejectFriend}
                   />
                 ))
               ) : (
@@ -335,6 +415,56 @@ function FriendsPage() {
           </section>
         </>
       )}
+
+      {friendToRemove ? (
+        <div
+          className={styles.modalOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="remove-friend-title"
+          onClick={handleCloseRemoveModal}
+        >
+          <div className={styles.modalContent} onClick={(event) => event.stopPropagation()}>
+            <h2 id="remove-friend-title" className={styles.modalTitle}>
+              Excluir amizade?
+            </h2>
+            <p className={styles.modalText}>
+              Voce deixara de ser amigo de{' '}
+              <strong>{friendToRemove.displayName}</strong>
+              {friendToRemove.username ? ` (@${friendToRemove.username})` : ''}.
+              Essa acao nao pode ser desfeita.
+            </p>
+
+            {removeErrorMessage ? (
+              <div className={styles.modalError} role="alert">
+                {removeErrorMessage}
+              </div>
+            ) : null}
+
+            <div className={styles.modalActions}>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={actionKey?.startsWith('remove:')}
+                onClick={handleCloseRemoveModal}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                className={styles.modalConfirmButton}
+                disabled={actionKey?.startsWith('remove:')}
+                onClick={handleConfirmRemoveFriendship}
+              >
+                {actionKey?.startsWith('remove:') ? 'Excluindo...' : 'Excluir amizade'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

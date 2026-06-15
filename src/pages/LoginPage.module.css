@@ -92,6 +92,16 @@
   gap: var(--spacing-3);
 }
 
+.avatarSection {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-3);
+  border: 1px solid var(--color-ink-100);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+}
+
 .errorMessage {
   padding: 10px 12px;
   border-radius: var(--radius-md);
