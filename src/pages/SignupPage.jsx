@@ -96,7 +96,7 @@ function SignupPage() {
         },
         avatarFile
       );
-      navigate('/home', { replace: true });
+      navigate('/profile', { replace: true });
     } catch (err) {
       if (err.message.toLowerCase().includes('username')) {
         setUsernameError(err.message);
@@ -114,12 +114,12 @@ function SignupPage() {
     <div className={styles.page}>
       <section className={styles.form}>
         <div className={styles.brand}>
-          <span className={styles.brandMark}>M</span>
-          <h1 className={styles.brandName}>Mnemo</h1>
+          <span className={styles.brandMark}>F</span>
+          <h1 className={styles.brandName}>Finis</h1>
         </div>
 
         <p className={styles.tagline}>
-          Crie sua conta para registrar memórias culturais e descobrir novas conexões.
+          Crie sua conta e comece a registrar tudo que você consumiu.
         </p>
 
         <form className={styles.fields} onSubmit={handleSubmit}>

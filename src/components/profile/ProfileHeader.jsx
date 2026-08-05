@@ -1,9 +1,22 @@
-import Avatar from '../ui/Avatar.jsx';
-import Button from '../ui/Button.jsx';
-import Icon from '../ui/Icon.jsx';
-import styles from './ProfileHeader.module.css';
+import Avatar from "../ui/Avatar.jsx";
+import Button from "../ui/Button.jsx";
+import Icon from "../ui/Icon.jsx";
+import styles from "./ProfileHeader.module.css";
 
-function ProfileHeader({ user, isOwnProfile = false, onEdit }) {
+const MEDIA_STATS_CONFIG = [
+  { id: "books", label: "Livros", icon: "book", color: "#3E5641" },
+  { id: "movies", label: "Filmes", icon: "film", color: "#7B1113" },
+  { id: "series", label: "Séries", icon: "tv", color: "#1F487E" },
+  { id: "games", label: "Jogos", icon: "gamepad", color: "#c9a227" },
+  { id: "comics", label: "HQs", icon: "comic", color: "#A5907E" },
+];
+
+function ProfileHeader({
+  user,
+  isOwnProfile = false,
+  onEdit,
+  mediaCounts = {},
+}) {
   return (
     <section className={styles.wrapper}>
       <div className={styles.content}>
@@ -13,15 +26,19 @@ function ProfileHeader({ user, isOwnProfile = false, onEdit }) {
           <span className={styles.nickname}>{user.nickname}</span>
           <p className={styles.bio}>{user.bio}</p>
 
-          {user.interests?.length ? (
-            <ul className={styles.interests}>
-              {user.interests.map((interest) => (
-                <li key={interest} className={styles.interest}>
-                  {interest}
-                </li>
-              ))}
-            </ul>
-          ) : null}
+          <ul className={styles.mediaStats} aria-label="Mídias consumidas">
+            {MEDIA_STATS_CONFIG.map(({ id, label, icon, color }) => (
+              <li key={id} className={styles.mediaStat}>
+                <span className={styles.mediaIcon} style={{ color }}>
+                  <Icon name={icon} size={24} strokeWidth={1.6} />
+                </span>
+                <span className={styles.mediaCount}>
+                  {mediaCounts[id] ?? 0}
+                </span>
+                <span className={styles.mediaLabel}>{label}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className={styles.actions}>

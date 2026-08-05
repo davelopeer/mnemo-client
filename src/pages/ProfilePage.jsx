@@ -1,24 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { resolveApiAssetUrl } from '../api/client.js';
-import * as profileApi from '../api/profile.js';
-import * as reviewsApi from '../api/reviews.js';
-import { useAuth } from '../auth/AuthContext.jsx';
-import ProfileHeader from '../components/profile/ProfileHeader.jsx';
-import PostCard from '../components/feed/PostCard.jsx';
-import ReviewForm from '../components/review/ReviewForm.jsx';
-import { currentUser, MEDIA_CATEGORIES } from '../data/mockData.js';
-import { reviewToPost } from '../utils/reviewPost.js';
-import styles from './ProfilePage.module.css';
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { resolveApiAssetUrl } from "../api/client.js";
+import * as profileApi from "../api/profile.js";
+import * as reviewsApi from "../api/reviews.js";
+import { useAuth } from "../auth/AuthContext.jsx";
+import ProfileHeader from "../components/profile/ProfileHeader.jsx";
+import PostCard from "../components/feed/PostCard.jsx";
+import ReviewForm from "../components/review/ReviewForm.jsx";
+import { currentUser, MEDIA_CATEGORIES } from "../data/mockData.js";
+import { reviewToPost } from "../utils/reviewPost.js";
+import styles from "./ProfilePage.module.css";
 
 const profileTabs = [
-  { id: 'posts', label: 'Reviews' },
-  { id: 'about', label: 'Sobre' },
-  { id: 'collections', label: 'Coleções' }
+  { id: "posts", label: "Reviews" },
+  { id: "about", label: "Sobre" },
+  { id: "collections", label: "Coleções" },
 ];
 
 function profileToUser(profile, fallbackUser) {
-  const usernameLabel = profile.username ? `@${profile.username}` : 'Username ainda não definido';
+  const usernameLabel = profile.username
+    ? `@${profile.username}`
+    : "Username ainda não definido";
 
   return {
     ...fallbackUser,
@@ -26,8 +28,8 @@ function profileToUser(profile, fallbackUser) {
     name: profile.displayName,
     nickname: usernameLabel,
     avatarUrl: resolveApiAssetUrl(profile.profileImageUrl),
-    bio: profile.description ?? 'Esse perfil ainda não tem descrição.',
-    interests: fallbackUser.interests
+    bio: profile.description ?? "Esse perfil ainda não tem descrição.",
+    interests: fallbackUser.interests,
   };
 }
 
@@ -35,14 +37,14 @@ function ProfilePage() {
   const { username } = useParams();
   const navigate = useNavigate();
   const { token, user } = useAuth();
-  const [activeTab, setActiveTab] = useState('posts');
+  const [activeTab, setActiveTab] = useState("posts");
   const [profile, setProfile] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [status, setStatus] = useState('loading');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [status, setStatus] = useState("loading");
+  const [errorMessage, setErrorMessage] = useState("");
   const [editingPost, setEditingPost] = useState(null);
   const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
-  const [editErrorMessage, setEditErrorMessage] = useState('');
+  const [editErrorMessage, setEditErrorMessage] = useState("");
   const [deletingId, setDeletingId] = useState(null);
   const isOwnProfile = !username;
 
@@ -50,25 +52,28 @@ function ProfilePage() {
     let isMounted = true;
 
     async function loadProfile() {
-      setStatus('loading');
-      setErrorMessage('');
+      setStatus("loading");
+      setErrorMessage("");
 
       try {
         const [profileData, reviewsData] = username
           ? await Promise.all([
               profileApi.getProfileByUsername(username),
-              reviewsApi.getProfileReviews(username)
+              reviewsApi.getProfileReviews(username),
             ])
-          : await Promise.all([profileApi.getMyProfile(token), reviewsApi.getMyProfileReviews(token)]);
+          : await Promise.all([
+              profileApi.getMyProfile(token),
+              reviewsApi.getMyProfileReviews(token),
+            ]);
 
         if (isMounted) {
           setProfile(profileData);
           setReviews((reviewsData.items ?? []).map(reviewToPost));
-          setStatus('success');
+          setStatus("success");
         }
       } catch (error) {
         if (isMounted) {
-          setStatus('error');
+          setStatus("error");
           setErrorMessage(error.message);
         }
       }
@@ -85,7 +90,9 @@ function ProfilePage() {
     if (deletingId) {
       return;
     }
-    const confirmed = window.confirm('Tem certeza que deseja deletar esta review? Essa ação não pode ser desfeita.');
+    const confirmed = window.confirm(
+      "Tem certeza que deseja deletar esta review? Essa ação não pode ser desfeita.",
+    );
     if (!confirmed) {
       return;
     }
@@ -102,7 +109,7 @@ function ProfilePage() {
   };
 
   const handleEditPost = (post) => {
-    setEditErrorMessage('');
+    setEditErrorMessage("");
     setEditingPost(post);
   };
 
@@ -111,7 +118,7 @@ function ProfilePage() {
       return;
     }
     setEditingPost(null);
-    setEditErrorMessage('');
+    setEditErrorMessage("");
   };
 
   const handleSubmitEdit = async (payload) => {
@@ -119,12 +126,18 @@ function ProfilePage() {
       return;
     }
     setIsSubmittingEdit(true);
-    setEditErrorMessage('');
+    setEditErrorMessage("");
     try {
-      const updated = await reviewsApi.updateReview(token, editingPost.id, payload);
+      const updated = await reviewsApi.updateReview(
+        token,
+        editingPost.id,
+        payload,
+      );
       const updatedPost = reviewToPost(updated);
       setReviews((previous) =>
-        previous.map((item) => (item.id === updatedPost.id ? updatedPost : item))
+        previous.map((item) =>
+          item.id === updatedPost.id ? updatedPost : item,
+        ),
       );
       setEditingPost(null);
     } catch (error) {
@@ -140,27 +153,47 @@ function ProfilePage() {
         ? {
             ...currentUser,
             name: `${user.firstName} ${user.lastName}`,
-            nickname: user.email
+            nickname: user.email,
           }
         : currentUser,
-    [user]
+    [user],
   );
-  const pageUser = profile ? profileToUser(profile, fallbackUser) : fallbackUser;
-  const pageClassName = `${styles.page} ${username ? styles.publicPage : ''}`;
+  const pageUser = profile
+    ? profileToUser(profile, fallbackUser)
+    : fallbackUser;
 
-  if (status === 'loading') {
+  const mediaCounts = useMemo(() => {
+    const counts = { books: 0, movies: 0, series: 0, games: 0, comics: 0 };
+    for (const r of reviews) {
+      if (r.category in counts) counts[r.category]++;
+    }
+    return counts;
+  }, [reviews]);
+  const pageClassName = `${styles.page} ${username ? styles.publicPage : ""}`;
+
+  if (status === "loading") {
     return (
-      <section className={`${styles.emptyState} ${username ? styles.publicPage : ''}`} aria-live="polite">
+      <section
+        className={`${styles.emptyState} ${username ? styles.publicPage : ""}`}
+        aria-live="polite"
+      >
         <h3>Carregando perfil...</h3>
         <p>Estamos buscando as informações mais recentes.</p>
       </section>
     );
   }
 
-  if (status === 'error') {
+  if (status === "error") {
     return (
-      <section className={`${styles.emptyState} ${username ? styles.publicPage : ''}`} aria-live="assertive">
-        <h3>{username ? 'Perfil não encontrado.' : 'Não foi possível carregar seu perfil.'}</h3>
+      <section
+        className={`${styles.emptyState} ${username ? styles.publicPage : ""}`}
+        aria-live="assertive"
+      >
+        <h3>
+          {username
+            ? "Perfil não encontrado."
+            : "Não foi possível carregar seu perfil."}
+        </h3>
         <p>{errorMessage}</p>
       </section>
     );
@@ -171,7 +204,8 @@ function ProfilePage() {
       <ProfileHeader
         user={pageUser}
         isOwnProfile={isOwnProfile}
-        onEdit={() => navigate('/profile/edit')}
+        onEdit={() => navigate("/profile/edit")}
+        mediaCounts={mediaCounts}
       />
 
       <nav className={styles.tabs} aria-label="Seções do perfil">
@@ -180,14 +214,14 @@ function ProfilePage() {
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
-            className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
+            className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ""}`}
           >
             {tab.label}
           </button>
         ))}
       </nav>
 
-      {activeTab === 'posts' && (
+      {activeTab === "posts" && (
         <>
           {reviews.length > 0 ? (
             <section className={styles.posts}>
@@ -206,15 +240,15 @@ function ProfilePage() {
               <h3>Nenhuma review por aqui ainda.</h3>
               <p>
                 {isOwnProfile
-                  ? 'Publique sua primeira review para montar seu histórico.'
-                  : 'Este perfil ainda não publicou reviews.'}
+                  ? "Publique sua primeira review para montar seu histórico."
+                  : "Este perfil ainda não publicou reviews."}
               </p>
             </section>
           )}
         </>
       )}
 
-      {activeTab === 'about' && (
+      {activeTab === "about" && (
         <section className={styles.about}>
           <article>
             <h3>Interesses</h3>
@@ -223,7 +257,9 @@ function ProfilePage() {
                 <li
                   key={item.id}
                   className={
-                    pageUser.interests.includes(item.label) ? styles.interestActive : ''
+                    pageUser.interests.includes(item.label)
+                      ? styles.interestActive
+                      : ""
                   }
                 >
                   {item.label}
@@ -238,10 +274,12 @@ function ProfilePage() {
         </section>
       )}
 
-      {activeTab === 'collections' && (
+      {activeTab === "collections" && (
         <section className={styles.emptyState}>
           <h3>Coleções chegam em breve.</h3>
-          <p>Você poderá agrupar reviews em temas — tipo “cyberpunk dos anos 80”.</p>
+          <p>
+            Você poderá agrupar reviews em temas — tipo “cyberpunk dos anos 80”.
+          </p>
         </section>
       )}
 
@@ -252,7 +290,10 @@ function ProfilePage() {
           aria-modal="true"
           onClick={handleCloseEdit}
         >
-          <div className={styles.modalContent} onClick={(event) => event.stopPropagation()}>
+          <div
+            className={styles.modalContent}
+            onClick={(event) => event.stopPropagation()}
+          >
             <ReviewForm
               mode="edit"
               initialValues={editingPost.editValues}

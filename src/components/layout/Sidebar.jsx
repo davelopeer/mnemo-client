@@ -12,9 +12,7 @@ import { currentUser } from '../../data/mockData.js';
 import styles from './Sidebar.module.css';
 
 const sidebarLinks = [
-  { to: '/home', label: 'Home', icon: 'home' },
   { to: '/profile', label: 'Meu perfil', icon: 'user' },
-  { to: '/amigos', label: 'Amigos', icon: 'friends' }
 ];
 
 function Sidebar() {
@@ -103,7 +101,7 @@ function Sidebar() {
       </nav>
 
       <footer className={styles.pillars}>
-        <h4 className={styles.pillarsTitle}>Mnemo</h4>
+        <h4 className={styles.pillarsTitle}>Finis</h4>
         <p>
           <strong>Memória</strong> do que você consumiu.
         </p>
@@ -111,7 +109,7 @@ function Sidebar() {
           <strong>Descoberta</strong> de novas obras.
         </p>
         <p>
-          <strong>Conexão</strong> com pessoas afins.
+          <strong>Registro</strong> do que importa para você.
         </p>
       </footer>
     </aside>

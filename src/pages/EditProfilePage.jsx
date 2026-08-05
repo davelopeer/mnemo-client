@@ -144,7 +144,7 @@ function EditProfilePage() {
         <div>
           <span className={styles.eyebrow}>Perfil</span>
           <h1>Editar perfil</h1>
-          <p>Escolha como as outras pessoas vão encontrar você no Mnemo.</p>
+          <p>Escolha como as outras pessoas vão encontrar você no Finis.</p>
         </div>
         <div className={styles.headerActions}>
           {profile?.username ? (

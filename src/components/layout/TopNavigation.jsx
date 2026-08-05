@@ -21,19 +21,12 @@ function TopNavigation() {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Link to="/home" className={styles.brand}>
-          <span className={styles.brandMark}>M</span>
-          <span className={styles.brandName}>Mnemo</span>
+        <Link to="/profile" className={styles.brand}>
+          <span className={styles.brandMark}>F</span>
+          <span className={styles.brandName}>Finis</span>
         </Link>
 
         <nav className={styles.links} aria-label="Navegação principal">
-          <NavLink
-            to="/home"
-            className={({ isActive }) => `${styles.link} ${isActive ? styles.linkActive : ''}`}
-          >
-            Início
-          </NavLink>
-
           {secondaryLinks.map((item) => (
             <NavLink
               key={item.to}

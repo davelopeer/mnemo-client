@@ -18,7 +18,7 @@ function RootRoute() {
     return null;
   }
 
-  return isAuthenticated ? <Navigate to="/home" replace /> : <LoginPage />;
+  return isAuthenticated ? <Navigate to="/profile" replace /> : <LoginPage />;
 }
 
 function App() {
@@ -46,8 +46,8 @@ function App() {
                 subtitle="Uma biblioteca moderna que virou rede social."
               >
                 <p>
-                  Mnemo nasce da crença de que o que lemos, assistimos e jogamos diz muito sobre
-                  quem somos. Queremos que cada memória cultural vire ponto de conexão.
+                  Finis nasce da crença de que o que lemos, assistimos e jogamos diz muito sobre
+                  quem somos. Aqui você registra sua trajetória cultural, para si mesmo.
                 </p>
                 <p>
                   Aqui não tem métrica de popularidade, só conversa honesta sobre obras — de
@@ -60,8 +60,8 @@ function App() {
             path="/contato"
             element={
               <StaticPage title="Contato" subtitle="Adoramos ouvir leitores, espectadores e jogadores.">
-                <p>Email: ola@mnemo.app</p>
-                <p>Instagram: @mnemo.app</p>
+                <p>Email: ola@finis.app</p>
+                <p>Instagram: @finis.app</p>
               </StaticPage>
             }
           />
@@ -73,7 +73,7 @@ function App() {
                   <strong>Posso importar meus livros do Goodreads?</strong> Em breve.
                 </p>
                 <p>
-                  <strong>Mnemo é gratuito?</strong> Sim, nas funcionalidades principais.
+                  <strong>Finis é gratuito?</strong> Sim, nas funcionalidades principais.
                 </p>
                 <p>
                   <strong>Como descubro amigos?</strong> Pela página de amigos, buscando por

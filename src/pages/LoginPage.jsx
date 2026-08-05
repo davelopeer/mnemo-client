@@ -33,7 +33,7 @@ function LoginPage() {
 
     try {
       await signIn(formData);
-      navigate(location.state?.from?.pathname ?? '/home', { replace: true });
+      navigate(location.state?.from?.pathname ?? '/profile', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -45,12 +45,12 @@ function LoginPage() {
     <div className={styles.page}>
       <section className={styles.form}>
         <div className={styles.brand}>
-          <span className={styles.brandMark}>M</span>
-          <h1 className={styles.brandName}>Mnemo</h1>
+          <span className={styles.brandMark}>F</span>
+          <h1 className={styles.brandName}>Finis</h1>
         </div>
 
         <p className={styles.tagline}>
-          Sua biblioteca cultural. Memória, descoberta e conexão em um só lugar.
+          Sua biblioteca cultural pessoal. Registre tudo que você leu, assistiu e jogou.
         </p>
 
         <form className={styles.fields} onSubmit={handleSubmit}>
@@ -125,11 +125,11 @@ function LoginPage() {
           </div>
           <div>
             <span className={styles.pillarLabel}>Descoberta</span>
-            <p>Explore o que pessoas com gosto parecido estão consumindo.</p>
+            <p>Organize seu acervo cultural de forma simples e privada.</p>
           </div>
           <div>
-            <span className={styles.pillarLabel}>Conexão</span>
-            <p>Converse sobre obras, autores e temas que te movem.</p>
+            <span className={styles.pillarLabel}>Reflexão</span>
+            <p>Relembre e avalie tudo que passou pelas suas mãos.</p>
           </div>
         </div>
       </section>

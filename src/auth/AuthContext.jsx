@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as authApi from '../api/auth.js';
 
-const STORAGE_KEY = 'mnemo.auth';
+const STORAGE_KEY = 'finis.auth';
 
 const AuthContext = createContext(null);
 
