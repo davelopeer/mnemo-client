@@ -1,20 +1,12 @@
-import { RECOMMENDATION_TYPES } from '../../data/mockData.js';
+import StarRating from './StarRating.jsx';
 import styles from './RecommendationBadge.module.css';
 
-const toneClassMap = {
-  positive: styles.positive,
-  neutral: styles.neutral,
-  negative: styles.negative
-};
-
-function RecommendationBadge({ recommendationId }) {
-  const recommendation = RECOMMENDATION_TYPES.find((item) => item.id === recommendationId);
-  if (!recommendation) return null;
+function RecommendationBadge({ rating }) {
+  if (!rating || rating <= 0) return null;
 
   return (
-    <span className={`${styles.badge} ${toneClassMap[recommendation.tone]}`}>
-      <span className={styles.dot} aria-hidden="true" />
-      {recommendation.label}
+    <span className={styles.badge} aria-label={`${rating} de 5 estrelas`}>
+      <StarRating value={rating} readOnly size="sm" />
     </span>
   );
 }

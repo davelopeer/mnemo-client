@@ -6,11 +6,6 @@ export const MEDIA_CATEGORIES = [
   { id: 'comics', label: 'HQs' }
 ];
 
-export const RECOMMENDATION_TYPES = [
-  { id: 'recommend', label: 'Recomendo', tone: 'positive' },
-  { id: 'neutral', label: 'Indiferente', tone: 'neutral' },
-  { id: 'not_recommend', label: 'Não recomendo', tone: 'negative' }
-];
 
 export const currentUser = {
   id: 'u-001',
@@ -33,11 +28,8 @@ export const feedPosts = [
     category: 'books',
     title: 'Neuromancer',
     subtitle: 'William Gibson, 1984',
-    coverUrl: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600',
-    recommendation: 'recommend',
-    postedAt: 'há 2 horas',
-    body:
-      'Uma prosa cortante que inventou o ciberespaço antes da internet existir. Gibson desenha a Chiba City como se fosse um sonho febril — dá para sentir o neon queimando nos olhos. Um daqueles livros que você termina e precisa ficar calado por uma hora.'
+    rating: 4.5,
+    postedAt: 'há 2 horas'
   },
   {
     id: 'p-102',
@@ -49,11 +41,8 @@ export const feedPosts = [
     category: 'movies',
     title: 'Paris, Texas',
     subtitle: 'Wim Wenders, 1984',
-    coverUrl: 'https://images.unsplash.com/photo-1489599735734-79b4169c2a78?w=600',
-    recommendation: 'recommend',
-    postedAt: 'há 5 horas',
-    body:
-      'Nunca chorei tanto com silêncios. Harry Dean Stanton caminhando naquele deserto vermelho é cinema na sua forma mais essencial: imagem, tempo, saudade.'
+    rating: 5.0,
+    postedAt: 'há 5 horas'
   },
   {
     id: 'p-103',
@@ -65,11 +54,8 @@ export const feedPosts = [
     category: 'games',
     title: 'Disco Elysium',
     subtitle: 'ZA/UM, 2019',
-    coverUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600',
-    recommendation: 'recommend',
-    postedAt: 'ontem',
-    body:
-      'Um RPG que não tem combate, só conversas — inclusive com as vozes da sua própria cabeça. É literatura disfarçada de jogo.'
+    rating: 4.5,
+    postedAt: 'ontem'
   },
   {
     id: 'p-104',
@@ -81,11 +67,8 @@ export const feedPosts = [
     category: 'series',
     title: 'The Bear',
     subtitle: 'FX, 2ª temporada',
-    coverUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600',
-    recommendation: 'neutral',
-    postedAt: 'há 2 dias',
-    body:
-      'A segunda temporada tem episódios geniais (Forks!) mas se perde em subtramas. Continuo assistindo pela Ayo Edebiri, que rouba cada cena.'
+    rating: 3.0,
+    postedAt: 'há 2 dias'
   },
   {
     id: 'p-105',
@@ -97,11 +80,8 @@ export const feedPosts = [
     category: 'comics',
     title: 'Sandman — Prelúdios e Noturnos',
     subtitle: 'Neil Gaiman, 1989',
-    coverUrl: 'https://images.unsplash.com/photo-1569931727741-f5baeff0014a?w=600',
-    recommendation: 'not_recommend',
-    postedAt: 'há 3 dias',
-    body:
-      'Reli depois de 15 anos e senti o peso do tempo. A arte do Sam Kieth envelheceu mal para mim. Talvez só eu não seja mais o leitor certo.'
+    rating: 2.5,
+    postedAt: 'há 3 dias'
   }
 ];
 
@@ -112,11 +92,8 @@ export const userPosts = [
     category: 'books',
     title: 'Pedro Páramo',
     subtitle: 'Juan Rulfo, 1955',
-    coverUrl: 'https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=600',
-    recommendation: 'recommend',
-    postedAt: 'há 1 semana',
-    body:
-      'Um romance curto e assombrado. Rulfo te leva a Comala pela mão e, quando você percebe, está conversando com mortos sem saber quem é vivo.'
+    rating: 5.0,
+    postedAt: 'há 1 semana'
   },
   {
     id: 'p-002',
@@ -124,10 +101,8 @@ export const userPosts = [
     category: 'movies',
     title: 'Ran',
     subtitle: 'Akira Kurosawa, 1985',
-    coverUrl: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=600',
-    recommendation: 'recommend',
-    postedAt: 'há 2 semanas',
-    body: 'Rei Lear virou épico samurai. A cena da queda do castelo, sem trilha, é cinema puro.'
+    rating: 5.0,
+    postedAt: 'há 2 semanas'
   },
   {
     id: 'p-003',
@@ -135,10 +110,8 @@ export const userPosts = [
     category: 'series',
     title: 'Better Call Saul',
     subtitle: 'AMC, final',
-    coverUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600',
-    recommendation: 'recommend',
-    postedAt: 'há 1 mês',
-    body: 'Mais contido que Breaking Bad, mais triste. A lenta corrosão de um homem bom.'
+    rating: 4.5,
+    postedAt: 'há 1 mês'
   }
 ];
 

@@ -1,15 +1,8 @@
 import { useState } from 'react';
 import Button from '../ui/Button.jsx';
-import { MEDIA_CATEGORIES, RECOMMENDATION_TYPES } from '../../data/mockData.js';
+import StarRating from '../ui/StarRating.jsx';
+import { MEDIA_CATEGORIES } from '../../data/mockData.js';
 import styles from './ReviewForm.module.css';
-
-const MAX_REVIEW_LENGTH = 1902;
-
-const toneClassMap = {
-  positive: styles.optionPositive,
-  neutral: styles.optionNeutral,
-  negative: styles.optionNegative
-};
 
 function ReviewForm({
   onSubmit,
@@ -26,20 +19,13 @@ function ReviewForm({
     initialValues?.mediaYear != null ? String(initialValues.mediaYear) : ''
   );
   const [category, setCategory] = useState(initialValues?.category ?? MEDIA_CATEGORIES[0].id);
-  const [recommendation, setRecommendation] = useState(initialValues?.recommendation ?? '');
-  const [body, setBody] = useState(initialValues?.body ?? '');
-  const [photo, setPhoto] = useState(null);
+  const [rating, setRating] = useState(initialValues?.rating ?? 0);
 
-  const remainingCharacters = MAX_REVIEW_LENGTH - body.length;
-  const isOverLimit = remainingCharacters < 0;
   const canSubmit =
     title.trim().length > 0 &&
     mediaAuthor.trim().length > 0 &&
     mediaYear.trim().length > 0 &&
-    recommendation.trim().length > 0 &&
-    body.trim().length > 0 &&
-    (isEdit || Boolean(photo)) &&
-    !isOverLimit &&
+    rating > 0 &&
     !isSubmitting;
 
   const handleSubmit = (event) => {
@@ -50,20 +36,18 @@ function ReviewForm({
       mediaAuthor,
       mediaYear,
       category,
-      recommendation,
-      body,
-      photo
+      rating
     });
   };
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <header className={styles.header}>
-        <h1>{isEdit ? 'Editar review' : 'Nova review'}</h1>
+        <h1>{isEdit ? 'Editar Finis' : 'Novo Finis'}</h1>
         <p>
           {isEdit
-            ? 'Atualize os detalhes da sua review.'
-            : 'Compartilhe com seus amigos o que você anda consumindo.'}
+            ? 'Atualize os detalhes do seu Finis.'
+            : 'Registre uma obra que você finalizou.'}
         </p>
       </header>
 
@@ -125,57 +109,12 @@ function ReviewForm({
       </div>
 
       <div className={styles.field}>
-        <label>Recomendação</label>
-        <div className={styles.recommendationRow}>
-          {RECOMMENDATION_TYPES.map((item) => {
-            const isSelected = recommendation === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setRecommendation(isSelected ? '' : item.id)}
-                className={`${styles.option} ${toneClassMap[item.tone]} ${
-                  isSelected ? styles.optionSelected : ''
-                }`}
-              >
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className={styles.field}>
-        <label htmlFor="review-photo">Foto da review</label>
-        <input
-          id="review-photo"
-          className={styles.input}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(event) => setPhoto(event.target.files?.[0] ?? null)}
-        />
-        <p className={styles.helperText}>
-          {isEdit
-            ? 'Opcional. Envie uma nova imagem para substituir a atual. JPG, PNG ou WEBP com até 5 MB.'
-            : 'Obrigatória. Use JPG, PNG ou WEBP com até 5 MB.'}
-        </p>
-      </div>
-
-      <div className={styles.field}>
-        <label htmlFor="review-body">Sua review</label>
-        <textarea
-          id="review-body"
-          className={styles.textarea}
-          placeholder="O que você achou? Do que gostou? Do que não gostou?"
-          value={body}
-          onChange={(event) => setBody(event.target.value)}
-          rows={10}
-        />
-        <div
-          className={`${styles.counter} ${isOverLimit ? styles.counterOver : ''}`}
-          aria-live="polite"
-        >
-          {remainingCharacters} caracteres restantes
+        <label>Nota</label>
+        <div className={styles.ratingRow}>
+          <StarRating value={rating} onChange={setRating} size="lg" />
+          {rating > 0 && (
+            <span className={styles.ratingLabel}>{rating} / 5</span>
+          )}
         </div>
       </div>
 
@@ -196,7 +135,7 @@ function ReviewForm({
               : 'Salvar alterações'
             : isSubmitting
               ? 'Publicando...'
-              : 'Publicar review'}
+              : 'Finis'}
         </Button>
       </footer>
     </form>

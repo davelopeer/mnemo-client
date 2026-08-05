@@ -35,17 +35,14 @@ export function reviewToPost(review) {
     category: review.category,
     title: review.mediaTitle,
     subtitle: workMetadata || review.mediaSubtitle || '',
-    coverUrl: resolveApiAssetUrl(review.photoUrl, review.updatedAt ?? review.createdAt),
-    recommendation: review.recommendation,
+    rating: review.rating,
     postedAt: formatPostedAt(review.createdAt),
-    body: review.body,
     editValues: {
       mediaTitle: review.mediaTitle,
       mediaAuthor: review.mediaAuthor,
       mediaYear: review.mediaYear,
       category: review.category,
-      recommendation: review.recommendation,
-      body: review.body
+      rating: review.rating
     }
   };
 }

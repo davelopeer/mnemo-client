@@ -1,14 +1,9 @@
 import Checkbox from '../ui/Checkbox.jsx';
 import Icon from '../ui/Icon.jsx';
-import { MEDIA_CATEGORIES, RECOMMENDATION_TYPES } from '../../data/mockData.js';
+import { MEDIA_CATEGORIES } from '../../data/mockData.js';
 import styles from './FeedFilters.module.css';
 
-function FeedFilters({
-  selectedCategories,
-  onToggleCategory,
-  selectedRecommendations,
-  onToggleRecommendation
-}) {
+function FeedFilters({ selectedCategories, onToggleCategory }) {
   return (
     <aside className={styles.panel}>
       <header className={styles.header}>
@@ -25,20 +20,6 @@ function FeedFilters({
               label={category.label}
               checked={selectedCategories.includes(category.id)}
               onChange={() => onToggleCategory(category.id)}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.group}>
-        <h4 className={styles.groupTitle}>Tipo de review</h4>
-        <div className={styles.options}>
-          {RECOMMENDATION_TYPES.map((recommendation) => (
-            <Checkbox
-              key={recommendation.id}
-              label={recommendation.label}
-              checked={selectedRecommendations.includes(recommendation.id)}
-              onChange={() => onToggleRecommendation(recommendation.id)}
             />
           ))}
         </div>

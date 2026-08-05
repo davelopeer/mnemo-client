@@ -1,0 +1,64 @@
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  user-select: none;
+}
+
+.size-sm { font-size: 18px; }
+.size-md { font-size: 24px; }
+.size-lg { font-size: 32px; }
+
+.slot {
+  position: relative;
+  display: inline-block;
+  cursor: default;
+}
+
+.stars:not([aria-label]) .slot {
+  cursor: pointer;
+}
+
+.star {
+  display: block;
+  position: relative;
+  color: var(--color-ink-200, #d0ccc8);
+  line-height: 1;
+  transition: color 0.12s ease;
+}
+
+.star::before {
+  content: '★';
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  color: #d4a017;
+  width: 0%;
+  transition: width 0.1s ease;
+  pointer-events: none;
+}
+
+.star.full::before  { width: 100%; }
+.star.half::before  { width: 52%; }
+.star.empty::before { width: 0%; }
+
+/* Interactive click zones overlay the star */
+.halfZone,
+.fullZone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.halfZone { left: 0; }
+.fullZone { right: 0; }
+
+.halfZone:focus,
+.fullZone:focus {
+  outline: 2px solid var(--color-primary, #7b1113);
+  outline-offset: 1px;
+  border-radius: 2px;
+}

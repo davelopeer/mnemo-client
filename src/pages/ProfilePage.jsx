@@ -12,7 +12,7 @@ import { reviewToPost } from "../utils/reviewPost.js";
 import styles from "./ProfilePage.module.css";
 
 const profileTabs = [
-  { id: "posts", label: "Reviews" },
+  { id: "posts", label: "Finis" },
   { id: "about", label: "Sobre" },
   { id: "collections", label: "Coleções" },
 ];
@@ -91,7 +91,7 @@ function ProfilePage() {
       return;
     }
     const confirmed = window.confirm(
-      "Tem certeza que deseja deletar esta review? Essa ação não pode ser desfeita.",
+      "Tem certeza que deseja deletar este Finis? Essa ação não pode ser desfeita.",
     );
     if (!confirmed) {
       return;
@@ -237,11 +237,11 @@ function ProfilePage() {
             </section>
           ) : (
             <section className={styles.emptyState}>
-              <h3>Nenhuma review por aqui ainda.</h3>
+              <h3>Nenhum Finis por aqui ainda.</h3>
               <p>
                 {isOwnProfile
-                  ? "Publique sua primeira review para montar seu histórico."
-                  : "Este perfil ainda não publicou reviews."}
+                  ? "Publique seu primeiro Finis para montar seu histórico."
+                  : "Este perfil ainda não publicou nenhum Finis."}
               </p>
             </section>
           )}

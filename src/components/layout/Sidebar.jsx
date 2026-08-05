@@ -82,7 +82,7 @@ function Sidebar() {
         iconLeft={<Icon name="plus" size={16} />}
         onClick={() => navigate('/criar-review')}
       >
-        Criar review
+        Finis
       </Button>
 
       <nav className={styles.nav} aria-label="Navegação do usuário">

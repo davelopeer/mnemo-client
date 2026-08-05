@@ -17,20 +17,14 @@ function PostCard({ post, canManage = false, onEdit, onDelete }) {
         <CategoryTag categoryId={post.category} />
       </header>
 
-      <div className={styles.media}>
-        <img src={post.coverUrl} alt={post.title} />
-      </div>
-
       <div className={styles.content}>
         <div className={styles.titleRow}>
           <div>
             <h3 className={styles.title}>{post.title}</h3>
             <p className={styles.subtitle}>{post.subtitle}</p>
           </div>
-          <RecommendationBadge recommendationId={post.recommendation} />
+          <RecommendationBadge rating={post.rating} />
         </div>
-
-        <p className={styles.body}>{post.body}</p>
 
         <footer className={styles.actions}>
           <button className={styles.actionButton} type="button">

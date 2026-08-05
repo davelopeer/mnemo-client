@@ -9,7 +9,6 @@ import styles from './HomePage.module.css';
 function HomePage() {
   const { token } = useAuth();
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedRecommendations, setSelectedRecommendations] = useState([]);
   const [posts, setPosts] = useState([]);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(false);
@@ -34,8 +33,7 @@ function HomePage() {
       try {
         const response = await feedApi.getFriendsFeed(token, {
           offset: nextOffset,
-          categories: selectedCategories,
-          recommendations: selectedRecommendations
+          categories: selectedCategories
         });
 
         const mappedPosts = (response.items ?? []).map(reviewToPost);
@@ -58,7 +56,7 @@ function HomePage() {
         setIsLoadingMore(false);
       }
     },
-    [selectedCategories, selectedRecommendations, token]
+    [selectedCategories, token]
   );
 
   useEffect(() => {
@@ -92,16 +90,7 @@ function HomePage() {
     );
   };
 
-  const toggleRecommendation = (recommendationId) => {
-    setSelectedRecommendations((previous) =>
-      previous.includes(recommendationId)
-        ? previous.filter((id) => id !== recommendationId)
-        : [...previous, recommendationId]
-    );
-  };
-
-  const hasActiveFilters =
-    selectedCategories.length > 0 || selectedRecommendations.length > 0;
+  const hasActiveFilters = selectedCategories.length > 0;
 
   return (
     <div className={styles.layout}>
@@ -166,8 +155,6 @@ function HomePage() {
       <FeedFilters
         selectedCategories={selectedCategories}
         onToggleCategory={toggleCategory}
-        selectedRecommendations={selectedRecommendations}
-        onToggleRecommendation={toggleRecommendation}
       />
     </div>
   );

@@ -9,9 +9,7 @@ export function createReview(token, payload) {
   body.append('mediaAuthor', payload.mediaAuthor);
   body.append('mediaYear', payload.mediaYear);
   body.append('category', payload.category);
-  body.append('recommendation', payload.recommendation);
-  body.append('body', payload.body);
-  body.append('photo', payload.photo);
+  body.append('rating', String(payload.rating));
 
   if (payload.mediaSubtitle) {
     body.append('mediaSubtitle', payload.mediaSubtitle);
@@ -30,12 +28,7 @@ export function updateReview(token, id, payload) {
   body.append('mediaAuthor', payload.mediaAuthor);
   body.append('mediaYear', payload.mediaYear);
   body.append('category', payload.category);
-  body.append('recommendation', payload.recommendation);
-  body.append('body', payload.body);
-
-  if (payload.photo) {
-    body.append('photo', payload.photo);
-  }
+  body.append('rating', String(payload.rating));
 
   if (payload.mediaSubtitle) {
     body.append('mediaSubtitle', payload.mediaSubtitle);
