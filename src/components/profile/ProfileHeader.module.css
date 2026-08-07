@@ -46,11 +46,19 @@
 }
 
 .mediaStat {
+  list-style: none;
+}
+
+.mediaStatButton {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
   min-width: 48px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .mediaIcon {
@@ -61,11 +69,22 @@
   height: 44px;
   border-radius: var(--radius-md);
   background-color: var(--color-surface-muted);
-  transition: background-color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
-.mediaStat:hover .mediaIcon {
+.mediaStatButton:hover .mediaIcon {
   background-color: var(--color-ink-100);
+}
+
+.mediaStatButton.mediaStatActive .mediaIcon {
+  box-shadow: 0 0 0 2px currentColor;
+}
+
+.mediaStatButton.mediaStatActive .mediaLabel {
+  color: var(--color-ink-900);
+  font-weight: 600;
 }
 
 .mediaCount {

@@ -38,6 +38,7 @@ function ProfilePage() {
   const navigate = useNavigate();
   const { token, user } = useAuth();
   const [activeTab, setActiveTab] = useState("posts");
+  const [activeFilters, setActiveFilters] = useState([]);
   const [profile, setProfile] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [status, setStatus] = useState("loading");
@@ -169,6 +170,19 @@ function ProfilePage() {
     }
     return counts;
   }, [reviews]);
+
+  const filteredReviews = useMemo(() => {
+    if (activeFilters.length === 0) return reviews;
+    return reviews.filter((r) => activeFilters.includes(r.category));
+  }, [reviews, activeFilters]);
+
+  const handleFilterChange = (categoryId) => {
+    setActiveFilters((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId],
+    );
+  };
   const pageClassName = `${styles.page} ${username ? styles.publicPage : ""}`;
 
   if (status === "loading") {
@@ -206,6 +220,8 @@ function ProfilePage() {
         isOwnProfile={isOwnProfile}
         onEdit={() => navigate("/profile/edit")}
         mediaCounts={mediaCounts}
+        activeFilters={activeFilters}
+        onFilterChange={handleFilterChange}
       />
 
       <nav className={styles.tabs} aria-label="Seções do perfil">
@@ -223,9 +239,9 @@ function ProfilePage() {
 
       {activeTab === "posts" && (
         <>
-          {reviews.length > 0 ? (
+          {filteredReviews.length > 0 ? (
             <section className={styles.posts}>
-              {reviews.map((post) => (
+              {filteredReviews.map((post) => (
                 <PostCard
                   key={post.id}
                   post={post}
@@ -237,12 +253,21 @@ function ProfilePage() {
             </section>
           ) : (
             <section className={styles.emptyState}>
-              <h3>Nenhum Finis por aqui ainda.</h3>
-              <p>
-                {isOwnProfile
-                  ? "Publique seu primeiro Finis para montar seu histórico."
-                  : "Este perfil ainda não publicou nenhum Finis."}
-              </p>
+              {activeFilters.length > 0 ? (
+                <>
+                  <h3>Nenhum Finis nessa categoria.</h3>
+                  <p>Tente selecionar outra mídia ou remova o filtro.</p>
+                </>
+              ) : (
+                <>
+                  <h3>Nenhum Finis por aqui ainda.</h3>
+                  <p>
+                    {isOwnProfile
+                      ? "Publique seu primeiro Finis para montar seu histórico."
+                      : "Este perfil ainda não publicou nenhum Finis."}
+                  </p>
+                </>
+              )}
             </section>
           )}
         </>

@@ -45,7 +45,7 @@ a {
 }
 
 button {
-  font-family: inherit;
+  font-family: var(--font-heading);
   cursor: pointer;
   border: none;
   background: none;
