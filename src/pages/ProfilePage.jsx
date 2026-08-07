@@ -30,6 +30,9 @@ function profileToUser(profile, fallbackUser) {
     avatarUrl: resolveApiAssetUrl(profile.profileImageUrl),
     bio: profile.description ?? "Esse perfil ainda não tem descrição.",
     interests: fallbackUser.interests,
+    mediaPreferences: Array.isArray(profile.mediaPreferences)
+      ? profile.mediaPreferences
+      : null,
   };
 }
 
@@ -57,15 +60,32 @@ function ProfilePage() {
       setErrorMessage("");
 
       try {
-        const [profileData, reviewsData] = username
-          ? await Promise.all([
-              profileApi.getProfileByUsername(username),
-              reviewsApi.getProfileReviews(username),
-            ])
-          : await Promise.all([
-              profileApi.getMyProfile(token),
-              reviewsApi.getMyProfileReviews(token),
-            ]);
+        if (username) {
+          const profileData = await profileApi.getProfileByUsername(username);
+          if (!isMounted) {
+            return;
+          }
+
+          setProfile(profileData);
+
+          if (profileData.isPrivate) {
+            setReviews([]);
+            setStatus("success");
+            return;
+          }
+
+          const reviewsData = await reviewsApi.getProfileReviews(username);
+          if (isMounted) {
+            setReviews((reviewsData.items ?? []).map(reviewToPost));
+            setStatus("success");
+          }
+          return;
+        }
+
+        const [profileData, reviewsData] = await Promise.all([
+          profileApi.getMyProfile(token),
+          reviewsApi.getMyProfileReviews(token),
+        ]);
 
         if (isMounted) {
           setProfile(profileData);
@@ -163,18 +183,42 @@ function ProfilePage() {
     ? profileToUser(profile, fallbackUser)
     : fallbackUser;
 
+  const preferredCategories = useMemo(() => {
+    const prefs = pageUser.mediaPreferences;
+    if (!Array.isArray(prefs) || prefs.length === 0) {
+      return MEDIA_CATEGORIES;
+    }
+    return MEDIA_CATEGORIES.filter((item) => prefs.includes(item.id));
+  }, [pageUser.mediaPreferences]);
+
+  const preferredCategoryIds = useMemo(
+    () => preferredCategories.map((item) => item.id),
+    [preferredCategories],
+  );
+
+  const visibleReviews = useMemo(() => {
+    if (preferredCategoryIds.length === MEDIA_CATEGORIES.length) {
+      return reviews;
+    }
+    return reviews.filter((review) =>
+      preferredCategoryIds.includes(review.category),
+    );
+  }, [reviews, preferredCategoryIds]);
+
   const mediaCounts = useMemo(() => {
     const counts = { books: 0, movies: 0, series: 0, games: 0, comics: 0 };
-    for (const r of reviews) {
-      if (r.category in counts) counts[r.category]++;
+    for (const review of visibleReviews) {
+      if (review.category in counts) counts[review.category]++;
     }
     return counts;
-  }, [reviews]);
+  }, [visibleReviews]);
 
   const filteredReviews = useMemo(() => {
-    if (activeFilters.length === 0) return reviews;
-    return reviews.filter((r) => activeFilters.includes(r.category));
-  }, [reviews, activeFilters]);
+    if (activeFilters.length === 0) return visibleReviews;
+    return visibleReviews.filter((review) =>
+      activeFilters.includes(review.category),
+    );
+  }, [visibleReviews, activeFilters]);
 
   const handleFilterChange = (categoryId) => {
     setActiveFilters((prev) =>
@@ -213,6 +257,22 @@ function ProfilePage() {
     );
   }
 
+  if (username && profile?.isPrivate) {
+    return (
+      <div className={`${styles.publicPage}`}>
+        <div className={styles.privateProfile}>
+          <img
+            src="/vaso-san.png"
+            alt="Perfil privado"
+            className={styles.privateProfileImage}
+          />
+          <h2>Este perfil é privado</h2>
+          <p>O usuário escolheu manter seu perfil fora do alcance público.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={pageClassName}>
       <ProfileHeader
@@ -222,6 +282,7 @@ function ProfilePage() {
         mediaCounts={mediaCounts}
         activeFilters={activeFilters}
         onFilterChange={handleFilterChange}
+        mediaPreferences={pageUser.mediaPreferences}
       />
 
       <nav className={styles.tabs} aria-label="Seções do perfil">
@@ -278,15 +339,8 @@ function ProfilePage() {
           <article>
             <h3>Interesses</h3>
             <ul className={styles.interestList}>
-              {MEDIA_CATEGORIES.map((item) => (
-                <li
-                  key={item.id}
-                  className={
-                    pageUser.interests.includes(item.label)
-                      ? styles.interestActive
-                      : ""
-                  }
-                >
+              {preferredCategories.map((item) => (
+                <li key={item.id} className={styles.interestActive}>
                   {item.label}
                 </li>
               ))}
@@ -322,6 +376,7 @@ function ProfilePage() {
             <ReviewForm
               mode="edit"
               initialValues={editingPost.editValues}
+              categories={preferredCategories}
               onSubmit={handleSubmitEdit}
               onCancel={handleCloseEdit}
               isSubmitting={isSubmittingEdit}

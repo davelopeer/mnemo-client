@@ -1,25 +1,42 @@
-import { useState } from 'react';
-import Button from '../ui/Button.jsx';
-import StarRating from '../ui/StarRating.jsx';
-import { MEDIA_CATEGORIES } from '../../data/mockData.js';
-import styles from './ReviewForm.module.css';
+import { useState } from "react";
+import Button from "../ui/Button.jsx";
+import StarRating from "../ui/StarRating.jsx";
+import { MEDIA_CATEGORIES } from "../../data/mockData.js";
+import styles from "./ReviewForm.module.css";
 
 function ReviewForm({
   onSubmit,
   onCancel,
   isSubmitting = false,
-  errorMessage = '',
-  mode = 'create',
-  initialValues = null
+  errorMessage = "",
+  mode = "create",
+  initialValues = null,
+  categories = MEDIA_CATEGORIES,
 }) {
-  const isEdit = mode === 'edit';
-  const [title, setTitle] = useState(initialValues?.mediaTitle ?? '');
-  const [mediaAuthor, setMediaAuthor] = useState(initialValues?.mediaAuthor ?? '');
-  const [mediaYear, setMediaYear] = useState(
-    initialValues?.mediaYear != null ? String(initialValues.mediaYear) : ''
+  const isEdit = mode === "edit";
+  const availableCategories =
+    Array.isArray(categories) && categories.length > 0
+      ? categories
+      : MEDIA_CATEGORIES;
+  const [title, setTitle] = useState(initialValues?.mediaTitle ?? "");
+  const [mediaAuthor, setMediaAuthor] = useState(
+    initialValues?.mediaAuthor ?? "",
   );
-  const [category, setCategory] = useState(initialValues?.category ?? MEDIA_CATEGORIES[0].id);
+  const [mediaYear, setMediaYear] = useState(
+    initialValues?.mediaYear != null ? String(initialValues.mediaYear) : "",
+  );
+  const [category, setCategory] = useState(() => {
+    const initialCategory = initialValues?.category;
+    if (
+      initialCategory &&
+      availableCategories.some((item) => item.id === initialCategory)
+    ) {
+      return initialCategory;
+    }
+    return availableCategories[0].id;
+  });
   const [rating, setRating] = useState(initialValues?.rating ?? 0);
+  const [isPrivate, setIsPrivate] = useState(initialValues?.isPrivate ?? false);
 
   const canSubmit =
     title.trim().length > 0 &&
@@ -36,18 +53,19 @@ function ReviewForm({
       mediaAuthor,
       mediaYear,
       category,
-      rating
+      rating,
+      isPrivate,
     });
   };
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <header className={styles.header}>
-        <h1>{isEdit ? 'Editar Finis' : 'Novo Finis'}</h1>
+        <h1>{isEdit ? "Editar Finis" : "Novo Finis"}</h1>
         <p>
           {isEdit
-            ? 'Atualize os detalhes do seu Finis.'
-            : 'Registre uma obra que você finalizou.'}
+            ? "Atualize os detalhes do seu Finis."
+            : "Registre uma obra que você finalizou."}
         </p>
       </header>
 
@@ -72,7 +90,7 @@ function ReviewForm({
             value={category}
             onChange={(event) => setCategory(event.target.value)}
           >
-            {MEDIA_CATEGORIES.map((item) => (
+            {availableCategories.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.label}
               </option>
@@ -118,6 +136,24 @@ function ReviewForm({
         </div>
       </div>
 
+      <label className={styles.privacyToggle}>
+        <input
+          type="checkbox"
+          checked={isPrivate}
+          onChange={(event) => setIsPrivate(event.target.checked)}
+        />
+        <div className={styles.privacyToggleText}>
+          <span className={styles.privacyToggleTitle}>
+            {isPrivate ? "🔒 Finis privado" : "🌐 Finis público"}
+          </span>
+          <span className={styles.privacyToggleDesc}>
+            {isPrivate
+              ? "Somente você verá este Finis no seu perfil"
+              : "Visível para quem acessar seu perfil"}
+          </span>
+        </div>
+      </label>
+
       {errorMessage && (
         <p className={styles.errorMessage} role="alert">
           {errorMessage}
@@ -125,17 +161,22 @@ function ReviewForm({
       )}
 
       <footer className={styles.actions}>
-        <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onCancel}
+          disabled={isSubmitting}
+        >
           Cancelar
         </Button>
         <Button type="submit" variant="primary" disabled={!canSubmit}>
           {isEdit
             ? isSubmitting
-              ? 'Salvando...'
-              : 'Salvar alterações'
+              ? "Salvando..."
+              : "Salvar alterações"
             : isSubmitting
-              ? 'Publicando...'
-              : 'Finis'}
+              ? "Publicando..."
+              : "Finis"}
         </Button>
       </footer>
     </form>

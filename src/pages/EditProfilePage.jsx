@@ -1,44 +1,49 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { resolveApiAssetUrl } from '../api/client.js';
-import * as profileApi from '../api/profile.js';
-import { useAuth } from '../auth/AuthContext.jsx';
-import Avatar from '../components/ui/Avatar.jsx';
-import Button from '../components/ui/Button.jsx';
-import { currentUser } from '../data/mockData.js';
-import styles from './EditProfilePage.module.css';
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { resolveApiAssetUrl } from "../api/client.js";
+import * as profileApi from "../api/profile.js";
+import { useAuth } from "../auth/AuthContext.jsx";
+import Avatar from "../components/ui/Avatar.jsx";
+import Button from "../components/ui/Button.jsx";
+import Icon from "../components/ui/Icon.jsx";
+import { currentUser, MEDIA_CATEGORIES } from "../data/mockData.js";
+import styles from "./EditProfilePage.module.css";
 
 const usernamePattern = /^[a-zA-Z0-9_-]+$/;
 
 function validateUsername(username) {
   if (!username) {
-    return 'Informe um username.';
+    return "Informe um username.";
   }
-  if (username.startsWith('@')) {
-    return 'Informe o username sem @.';
+  if (username.startsWith("@")) {
+    return "Informe o username sem @.";
   }
   if (username.length < 3 || username.length > 30) {
-    return 'O username deve ter entre 3 e 30 caracteres.';
+    return "O username deve ter entre 3 e 30 caracteres.";
   }
   if (!usernamePattern.test(username)) {
-    return 'Use apenas letras, números, hífen e underline.';
+    return "Use apenas letras, números, hífen e underline.";
   }
-  return '';
+  return "";
 }
 
 function EditProfilePage() {
   const navigate = useNavigate();
   const { token, user } = useAuth();
   const [profile, setProfile] = useState(null);
-  const [username, setUsername] = useState('');
-  const [description, setDescription] = useState('');
+  const [username, setUsername] = useState("");
+  const [description, setDescription] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [mediaPreferences, setMediaPreferences] = useState(
+    MEDIA_CATEGORIES.map((c) => c.id),
+  );
   const [avatarFile, setAvatarFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [status, setStatus] = useState('loading');
-  const [formError, setFormError] = useState('');
-  const [usernameError, setUsernameError] = useState('');
-  const [avatarMessage, setAvatarMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [status, setStatus] = useState("loading");
+  const [formError, setFormError] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [avatarMessage, setAvatarMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     let isMounted = true;
@@ -48,13 +53,20 @@ function EditProfilePage() {
         const data = await profileApi.getMyProfile(token);
         if (isMounted) {
           setProfile(data);
-          setUsername(data.username ?? '');
-          setDescription(data.description ?? '');
-          setStatus('success');
+          setUsername(data.username ?? "");
+          setDescription(data.description ?? "");
+          setIsPrivate(data.isPrivate ?? false);
+          setMediaPreferences(
+            Array.isArray(data.mediaPreferences) &&
+              data.mediaPreferences.length > 0
+              ? data.mediaPreferences
+              : MEDIA_CATEGORIES.map((c) => c.id),
+          );
+          setStatus("success");
         }
       } catch (error) {
         if (isMounted) {
-          setStatus('error');
+          setStatus("error");
           setFormError(error.message);
         }
       }
@@ -69,7 +81,7 @@ function EditProfilePage() {
 
   useEffect(() => {
     if (!avatarFile) {
-      setPreviewUrl('');
+      setPreviewUrl("");
       return undefined;
     }
 
@@ -78,18 +90,20 @@ function EditProfilePage() {
     return () => URL.revokeObjectURL(objectUrl);
   }, [avatarFile]);
 
-  const displayName = profile?.displayName ?? (user ? `${user.firstName} ${user.lastName}` : currentUser.name);
+  const displayName =
+    profile?.displayName ??
+    (user ? `${user.firstName} ${user.lastName}` : currentUser.name);
   const avatarUrl = useMemo(
     () => previewUrl || resolveApiAssetUrl(profile?.profileImageUrl),
-    [previewUrl, profile?.profileImageUrl]
+    [previewUrl, profile?.profileImageUrl],
   );
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setFormError('');
-    setUsernameError('');
-    setSuccessMessage('');
-    setAvatarMessage('');
+    setFormError("");
+    setUsernameError("");
+    setSuccessMessage("");
+    setAvatarMessage("");
 
     const normalizedUsername = username.trim().toLowerCase();
     const usernameError = validateUsername(normalizedUsername);
@@ -98,10 +112,17 @@ function EditProfilePage() {
       return;
     }
 
+    const prefsToSave =
+      mediaPreferences.length > 0
+        ? mediaPreferences
+        : MEDIA_CATEGORIES.map((c) => c.id);
+
     try {
       const updatedProfile = await profileApi.updateMyProfile(token, {
         username: normalizedUsername,
-        description: description.trim() || null
+        description: description.trim() || null,
+        mediaPreferences: prefsToSave,
+        isPrivate,
       });
       let nextProfile = updatedProfile;
 
@@ -111,9 +132,9 @@ function EditProfilePage() {
       }
 
       setProfile(nextProfile);
-      navigate('/profile');
+      navigate("/profile");
     } catch (error) {
-      if (error.message.toLowerCase().includes('username')) {
+      if (error.message.toLowerCase().includes("username")) {
         setUsernameError(error.message);
       } else {
         setFormError(error.message);
@@ -121,7 +142,7 @@ function EditProfilePage() {
     }
   }
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <section className={styles.panel} aria-live="polite">
         <h1>Carregando perfil...</h1>
@@ -129,7 +150,7 @@ function EditProfilePage() {
     );
   }
 
-  if (status === 'error') {
+  if (status === "error") {
     return (
       <section className={styles.panel} aria-live="assertive">
         <h1>Não foi possível carregar seu perfil</h1>
@@ -148,11 +169,19 @@ function EditProfilePage() {
         </div>
         <div className={styles.headerActions}>
           {profile?.username ? (
-            <Button type="button" variant="outline" onClick={() => navigate(`/user/${profile.username}`)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate(`/user/${profile.username}`)}
+            >
               Ver perfil público
             </Button>
           ) : null}
-          <Button type="button" variant="outline" onClick={() => navigate('/profile')}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate("/profile")}
+          >
             Voltar
           </Button>
         </div>
@@ -168,19 +197,30 @@ function EditProfilePage() {
             accept="image/jpeg,image/png,image/webp"
             onChange={(event) => setAvatarFile(event.target.files?.[0] ?? null)}
           />
-          <span className={styles.helpText}>JPEG, PNG ou WEBP com até 5 MB.</span>
+          <span className={styles.helpText}>
+            JPEG, PNG ou WEBP com até 5 MB.
+          </span>
           {avatarFile ? (
-            <Button type="button" variant="ghost" size="sm" onClick={() => setAvatarFile(null)}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setAvatarFile(null)}
+            >
               Cancelar nova foto
             </Button>
           ) : null}
-          {avatarMessage ? <p className={styles.successMessage}>{avatarMessage}</p> : null}
+          {avatarMessage ? (
+            <p className={styles.successMessage}>{avatarMessage}</p>
+          ) : null}
         </div>
       </section>
 
       <label className={styles.field} htmlFor="username">
         <span>Username</span>
-        <div className={`${styles.usernameInput} ${usernameError ? styles.inputError : ''}`}>
+        <div
+          className={`${styles.usernameInput} ${usernameError ? styles.inputError : ""}`}
+        >
           <span aria-hidden="true">@</span>
           <input
             id="username"
@@ -190,9 +230,11 @@ function EditProfilePage() {
             required
             onChange={(event) => {
               setUsername(event.target.value);
-              setUsernameError('');
+              setUsernameError("");
             }}
-            aria-describedby={usernameError ? 'username-help username-error' : 'username-help'}
+            aria-describedby={
+              usernameError ? "username-help username-error" : "username-help"
+            }
             aria-invalid={Boolean(usernameError)}
           />
         </div>
@@ -216,12 +258,110 @@ function EditProfilePage() {
           placeholder="Conte um pouco sobre seus gostos culturais."
           onChange={(event) => setDescription(event.target.value)}
         />
-        <span className={styles.helpText}>{description.length}/128 caracteres</span>
+        <span className={styles.helpText}>
+          {description.length}/128 caracteres
+        </span>
       </label>
+
+      <fieldset className={styles.mediaPicker}>
+        <legend className={styles.mediaPickerLegend}>
+          <span>Mídias do perfil</span>
+          <span className={styles.helpText}>
+            Escolha quais mídias aparecerão nos botões e estatísticas do seu
+            perfil.
+          </span>
+        </legend>
+        <ul className={styles.mediaPickerList} role="list">
+          {MEDIA_CATEGORIES.map(({ id, label, color, icon }) => {
+            const selected = mediaPreferences.includes(id);
+            return (
+              <li key={id}>
+                <button
+                  type="button"
+                  className={`${styles.mediaPickerItem} ${selected ? styles.mediaPickerItemSelected : ""}`}
+                  onClick={() =>
+                    setMediaPreferences((prev) =>
+                      prev.includes(id)
+                        ? prev.filter((x) => x !== id)
+                        : [...prev, id],
+                    )
+                  }
+                  aria-pressed={selected}
+                  title={selected ? `Remover ${label}` : `Adicionar ${label}`}
+                >
+                  <span className={styles.mediaPickerIcon} style={{ color }}>
+                    <Icon name={icon} size={26} strokeWidth={1.5} />
+                  </span>
+                  <span className={styles.mediaPickerLabel}>{label}</span>
+                  {selected && (
+                    <span
+                      className={styles.mediaPickerCheck}
+                      aria-hidden="true"
+                    >
+                      ✓
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </fieldset>
+
+      <fieldset className={styles.privacyField}>
+        <legend
+          className={styles.privacyOptionTitle}
+          style={{ marginBottom: 8 }}
+        >
+          Visibilidade do perfil
+        </legend>
+        <div className={styles.privacyOptions}>
+          <div className={styles.privacyOption}>
+            <input
+              type="radio"
+              id="privacy-public"
+              name="profilePrivacy"
+              value="false"
+              checked={!isPrivate}
+              onChange={() => setIsPrivate(false)}
+            />
+            <label
+              htmlFor="privacy-public"
+              className={styles.privacyOptionLabel}
+            >
+              <span className={styles.privacyOptionTitle}>🌐 Público</span>
+              <span className={styles.privacyOptionDesc}>
+                Qualquer pessoa pode ver seu perfil
+              </span>
+            </label>
+          </div>
+          <div className={styles.privacyOption}>
+            <input
+              type="radio"
+              id="privacy-private"
+              name="profilePrivacy"
+              value="true"
+              checked={isPrivate}
+              onChange={() => setIsPrivate(true)}
+            />
+            <label
+              htmlFor="privacy-private"
+              className={styles.privacyOptionLabel}
+            >
+              <span className={styles.privacyOptionTitle}>🔒 Privado</span>
+              <span className={styles.privacyOptionDesc}>
+                Somente você vê seu perfil
+              </span>
+            </label>
+          </div>
+        </div>
+      </fieldset>
 
       <div className={styles.feedback} aria-live="polite">
         {formError ? <p className={styles.errorMessage}>{formError}</p> : null}
-        {successMessage ? <p className={styles.successMessage}>{successMessage}</p> : null}
+        {successMessage ? (
+          <p className={styles.successMessage}>{successMessage}</p>
+        ) : null}
       </div>
 
       <div className={styles.actions}>

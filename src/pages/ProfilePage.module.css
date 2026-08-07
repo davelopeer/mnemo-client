@@ -26,7 +26,9 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--color-ink-500);
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .tab:hover {
@@ -121,6 +123,37 @@
   color: var(--color-ink-500);
   font-size: 14px;
   margin-top: 6px;
+}
+
+.privateProfile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-8) var(--spacing-5);
+  text-align: center;
+}
+
+.privateProfileImage {
+  width: min(420px, 85vw);
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+}
+
+.privateProfile h2 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-ink-900);
+}
+
+.privateProfile p {
+  color: var(--color-ink-500);
+  font-size: 14px;
+  max-width: 36ch;
 }
 
 .modalOverlay {

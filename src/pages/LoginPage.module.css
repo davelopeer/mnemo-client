@@ -77,7 +77,9 @@
   border-radius: var(--radius-md);
   padding: 12px 14px;
   font-size: 15px;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .field input:focus {
@@ -102,6 +104,73 @@
   background-color: var(--color-surface);
 }
 
+.privacyField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.privacyField > span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-500);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.privacyOptions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-2);
+}
+
+.privacyOption {
+  position: relative;
+}
+
+.privacyOption input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.privacyOptionLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-ink-100);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background-color: var(--color-surface);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.privacyOptionLabel:hover {
+  border-color: var(--color-ink-300);
+}
+
+.privacyOption input[type="radio"]:checked + .privacyOptionLabel {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-tint);
+  background-color: var(--color-primary-tint);
+}
+
+.privacyOptionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-900);
+}
+
+.privacyOptionDesc {
+  font-size: 11px;
+  color: var(--color-ink-500);
+  line-height: 1.4;
+}
+
 .errorMessage {
   padding: 10px 12px;
   border-radius: var(--radius-md);
@@ -124,7 +193,7 @@
 
 .divider::before,
 .divider::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background-color: var(--color-ink-100);
@@ -143,8 +212,16 @@
   flex-direction: column;
   justify-content: space-between;
   background:
-    radial-gradient(700px 400px at 20% 30%, rgba(123, 17, 19, 0.35), transparent 65%),
-    radial-gradient(700px 400px at 80% 70%, rgba(31, 72, 126, 0.35), transparent 65%),
+    radial-gradient(
+      700px 400px at 20% 30%,
+      rgba(123, 17, 19, 0.35),
+      transparent 65%
+    ),
+    radial-gradient(
+      700px 400px at 80% 70%,
+      rgba(31, 72, 126, 0.35),
+      transparent 65%
+    ),
     linear-gradient(135deg, #241010, #0e1a2c);
   color: #efe8dc;
   overflow: hidden;

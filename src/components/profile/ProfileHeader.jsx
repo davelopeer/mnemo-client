@@ -1,15 +1,8 @@
 import Avatar from "../ui/Avatar.jsx";
 import Button from "../ui/Button.jsx";
 import Icon from "../ui/Icon.jsx";
+import { MEDIA_CATEGORIES } from "../../data/mockData.js";
 import styles from "./ProfileHeader.module.css";
-
-const MEDIA_STATS_CONFIG = [
-  { id: "books", label: "Livros", icon: "book", color: "#3E5641" },
-  { id: "movies", label: "Filmes", icon: "camera", color: "#7B1113" },
-  { id: "series", label: "Séries", icon: "tv", color: "#1F487E" },
-  { id: "games", label: "Jogos", icon: "gamepad", color: "#c9a227" },
-  { id: "comics", label: "HQs", icon: "comic", color: "#A5907E" },
-];
 
 function ProfileHeader({
   user,
@@ -18,7 +11,13 @@ function ProfileHeader({
   mediaCounts = {},
   activeFilters = [],
   onFilterChange = () => {},
+  mediaPreferences = null,
 }) {
+  const visibleCategories =
+    mediaPreferences && mediaPreferences.length > 0
+      ? MEDIA_CATEGORIES.filter((c) => mediaPreferences.includes(c.id))
+      : MEDIA_CATEGORIES;
+
   return (
     <section className={styles.wrapper}>
       <div className={styles.content}>
@@ -28,30 +27,32 @@ function ProfileHeader({
           <span className={styles.nickname}>{user.nickname}</span>
           <p className={styles.bio}>{user.bio}</p>
 
-          <ul className={styles.mediaStats} aria-label="Mídias consumidas">
-            {MEDIA_STATS_CONFIG.map(({ id, label, icon, color }) => {
-              const isActive = activeFilters.includes(id);
-              return (
-                <li key={id} className={styles.mediaStat}>
-                  <button
-                    type="button"
-                    className={`${styles.mediaStatButton} ${isActive ? styles.mediaStatActive : ""}`}
-                    onClick={() => onFilterChange(id)}
-                    aria-pressed={isActive}
-                    title={`Filtrar por ${label}`}
-                  >
-                    <span className={styles.mediaIcon} style={{ color }}>
-                      <Icon name={icon} size={24} strokeWidth={1.6} />
-                    </span>
-                    <span className={styles.mediaCount}>
-                      {mediaCounts[id] ?? 0}
-                    </span>
-                    <span className={styles.mediaLabel}>{label}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          {visibleCategories.length > 0 && (
+            <ul className={styles.mediaStats} aria-label="Mídias consumidas">
+              {visibleCategories.map(({ id, icon, label, color }) => {
+                const isActive = activeFilters.includes(id);
+                return (
+                  <li key={id} className={styles.mediaStat}>
+                    <button
+                      type="button"
+                      className={`${styles.mediaStatButton} ${isActive ? styles.mediaStatActive : ""}`}
+                      onClick={() => onFilterChange(id)}
+                      aria-pressed={isActive}
+                      title={`Filtrar por ${label}`}
+                    >
+                      <span className={styles.mediaIcon} style={{ color }}>
+                        <Icon name={icon} size={24} strokeWidth={1.6} />
+                      </span>
+                      <span className={styles.mediaCount}>
+                        {mediaCounts[id] ?? 0}
+                      </span>
+                      <span className={styles.mediaLabel}>{label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
 
         <div className={styles.actions}>

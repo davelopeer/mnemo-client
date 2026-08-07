@@ -1,50 +1,51 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext.jsx';
-import Avatar from '../components/ui/Avatar.jsx';
-import Button from '../components/ui/Button.jsx';
-import styles from './LoginPage.module.css';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext.jsx";
+import Avatar from "../components/ui/Avatar.jsx";
+import Button from "../components/ui/Button.jsx";
+import styles from "./LoginPage.module.css";
 
 const usernamePattern = /^[a-zA-Z0-9_-]+$/;
 
 function validateUsername(username) {
   if (!username) {
-    return 'Informe um username.';
+    return "Informe um username.";
   }
-  if (username.startsWith('@')) {
-    return 'Informe o username sem @.';
+  if (username.startsWith("@")) {
+    return "Informe o username sem @.";
   }
   if (username.length < 3 || username.length > 30) {
-    return 'O username deve ter entre 3 e 30 caracteres.';
+    return "O username deve ter entre 3 e 30 caracteres.";
   }
   if (!usernamePattern.test(username)) {
-    return 'Use apenas letras, números, hífen e underline.';
+    return "Use apenas letras, números, hífen e underline.";
   }
-  return '';
+  return "";
 }
 
 function SignupPage() {
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    phone: '',
-    age: '',
-    username: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    phone: "",
+    age: "",
+    username: "",
+    isPrivate: false,
   });
   const [avatarFile, setAvatarFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [error, setError] = useState('');
-  const [usernameError, setUsernameError] = useState('');
-  const [avatarError, setAvatarError] = useState('');
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [error, setError] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [avatarError, setAvatarError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!avatarFile) {
-      setPreviewUrl('');
+      setPreviewUrl("");
       return undefined;
     }
 
@@ -55,22 +56,23 @@ function SignupPage() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((current) => ({ ...current, [name]: value }));
-    if (name === 'username') {
-      setUsernameError('');
+    const parsed = name === "isPrivate" ? value === "true" : value;
+    setFormData((current) => ({ ...current, [name]: parsed }));
+    if (name === "username") {
+      setUsernameError("");
     }
   };
 
   const handleAvatarChange = (event) => {
     setAvatarFile(event.target.files?.[0] ?? null);
-    setAvatarError('');
+    setAvatarError("");
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError('');
-    setUsernameError('');
-    setAvatarError('');
+    setError("");
+    setUsernameError("");
+    setAvatarError("");
 
     const normalizedUsername = formData.username.trim().toLowerCase();
     const nextUsernameError = validateUsername(normalizedUsername);
@@ -80,7 +82,7 @@ function SignupPage() {
     }
 
     if (!avatarFile) {
-      setAvatarError('Selecione uma foto de perfil.');
+      setAvatarError("Selecione uma foto de perfil.");
       return;
     }
 
@@ -92,15 +94,18 @@ function SignupPage() {
           ...formData,
           username: normalizedUsername,
           age: Number(formData.age),
-          phone: formData.phone.trim() || undefined
+          phone: formData.phone.trim() || undefined,
         },
-        avatarFile
+        avatarFile,
       );
-      navigate('/profile', { replace: true });
+      navigate("/profile", { replace: true });
     } catch (err) {
-      if (err.message.toLowerCase().includes('username')) {
+      if (err.message.toLowerCase().includes("username")) {
         setUsernameError(err.message);
-      } else if (err.message.toLowerCase().includes('imagem') || err.message.toLowerCase().includes('avatar')) {
+      } else if (
+        err.message.toLowerCase().includes("imagem") ||
+        err.message.toLowerCase().includes("avatar")
+      ) {
         setAvatarError(err.message);
       } else {
         setError(err.message);
@@ -188,18 +193,27 @@ function SignupPage() {
               placeholder="ana_vieira"
               autoComplete="username"
               required
-              aria-describedby={usernameError ? 'username-error' : undefined}
+              aria-describedby={usernameError ? "username-error" : undefined}
               aria-invalid={Boolean(usernameError)}
             />
             {usernameError ? (
-              <span id="username-error" className={styles.errorMessage} role="alert">
+              <span
+                id="username-error"
+                className={styles.errorMessage}
+                role="alert"
+              >
                 {usernameError}
               </span>
             ) : null}
           </label>
 
           <section className={styles.avatarSection}>
-            <Avatar src={previewUrl} alt="Prévia da foto de perfil" size="lg" ring />
+            <Avatar
+              src={previewUrl}
+              alt="Prévia da foto de perfil"
+              size="lg"
+              ring
+            />
             <label className={styles.field} htmlFor="avatar">
               <span>Foto de perfil</span>
               <input
@@ -216,6 +230,54 @@ function SignupPage() {
               ) : null}
             </label>
           </section>
+
+          <div
+            className={styles.privacyField}
+            role="group"
+            aria-labelledby="privacy-label"
+          >
+            <span id="privacy-label">Visibilidade do perfil</span>
+            <div className={styles.privacyOptions}>
+              <div className={styles.privacyOption}>
+                <input
+                  type="radio"
+                  id="privacy-public"
+                  name="isPrivate"
+                  value="false"
+                  checked={!formData.isPrivate}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="privacy-public"
+                  className={styles.privacyOptionLabel}
+                >
+                  <span className={styles.privacyOptionTitle}>🌐 Público</span>
+                  <span className={styles.privacyOptionDesc}>
+                    Qualquer pessoa pode ver seu perfil
+                  </span>
+                </label>
+              </div>
+              <div className={styles.privacyOption}>
+                <input
+                  type="radio"
+                  id="privacy-private"
+                  name="isPrivate"
+                  value="true"
+                  checked={formData.isPrivate}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="privacy-private"
+                  className={styles.privacyOptionLabel}
+                >
+                  <span className={styles.privacyOptionTitle}>🔒 Privado</span>
+                  <span className={styles.privacyOptionDesc}>
+                    Somente você vê seu perfil
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
 
           <div className={styles.fieldGrid}>
             <label className={styles.field}>
@@ -244,16 +306,32 @@ function SignupPage() {
           </div>
 
           {error ? (
-            <p className={styles.errorMessage} role="alert" aria-live="assertive">
+            <p
+              className={styles.errorMessage}
+              role="alert"
+              aria-live="assertive"
+            >
               {error}
             </p>
           ) : null}
 
-          <Button type="submit" variant="primary" size="lg" fullWidth disabled={isSubmitting}>
-            {isSubmitting ? 'Criando conta...' : 'Criar conta'}
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            fullWidth
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Criando conta..." : "Criar conta"}
           </Button>
 
-          <Button type="button" variant="outline" size="lg" fullWidth onClick={() => navigate('/')}>
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            fullWidth
+            onClick={() => navigate("/")}
+          >
             Ja tenho uma conta
           </Button>
         </form>
@@ -264,7 +342,8 @@ function SignupPage() {
           <span className={styles.pillarLabel}>Autenticação real</span>
           <h2>Seu espaço cultural começa com uma sessão segura.</h2>
           <p>
-            O cadastro cria a conta no backend, gera um token JWT e inicia a sessão automaticamente.
+            O cadastro cria a conta no backend, gera um token JWT e inicia a
+            sessão automaticamente.
           </p>
         </div>
       </section>
