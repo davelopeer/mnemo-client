@@ -54,6 +54,22 @@
   color: var(--color-ink-500);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: default;
+}
+
+button.stat {
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+button.stat:hover,
+button.stat:focus-visible {
+  color: var(--color-ink-900);
+  outline: none;
 }
 
 .stat strong {
@@ -83,7 +99,9 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--color-ink-700);
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .navLink:hover {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "../ui/Button.jsx";
+import Icon from "../ui/Icon.jsx";
 import StarRating from "../ui/StarRating.jsx";
 import { MEDIA_CATEGORIES } from "../../data/mockData.js";
 import styles from "./ReviewForm.module.css";
@@ -23,7 +24,7 @@ function ReviewForm({
     initialValues?.mediaAuthor ?? "",
   );
   const [mediaYear, setMediaYear] = useState(
-    initialValues?.mediaYear != null ? String(initialValues.mediaYear) : "",
+    initialValues?.mediaYear ? String(initialValues.mediaYear) : "",
   );
   const [category, setCategory] = useState(() => {
     const initialCategory = initialValues?.category;
@@ -38,20 +39,15 @@ function ReviewForm({
   const [rating, setRating] = useState(initialValues?.rating ?? 0);
   const [isPrivate, setIsPrivate] = useState(initialValues?.isPrivate ?? false);
 
-  const canSubmit =
-    title.trim().length > 0 &&
-    mediaAuthor.trim().length > 0 &&
-    mediaYear.trim().length > 0 &&
-    rating > 0 &&
-    !isSubmitting;
+  const canSubmit = title.trim().length > 0 && rating > 0 && !isSubmitting;
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!canSubmit) return;
     onSubmit({
       mediaTitle: title,
-      mediaAuthor,
-      mediaYear,
+      mediaAuthor: mediaAuthor.trim(),
+      mediaYear: mediaYear.trim(),
       category,
       rating,
       isPrivate,
@@ -101,12 +97,12 @@ function ReviewForm({
 
       <div className={styles.grid}>
         <div className={styles.field}>
-          <label htmlFor="review-author">Autor da obra</label>
+          <label htmlFor="review-author">Autor/produtora</label>
           <input
             id="review-author"
             className={styles.input}
             type="text"
-            placeholder="Ex: William Gibson"
+            placeholder="Ex: William Gibson (opcional)"
             value={mediaAuthor}
             onChange={(event) => setMediaAuthor(event.target.value)}
           />
@@ -119,7 +115,7 @@ function ReviewForm({
             className={styles.input}
             type="number"
             inputMode="numeric"
-            placeholder="Ex: 1984"
+            placeholder="Ex: 1984 (opcional)"
             value={mediaYear}
             onChange={(event) => setMediaYear(event.target.value)}
           />
@@ -136,23 +132,16 @@ function ReviewForm({
         </div>
       </div>
 
-      <label className={styles.privacyToggle}>
-        <input
-          type="checkbox"
-          checked={isPrivate}
-          onChange={(event) => setIsPrivate(event.target.checked)}
-        />
-        <div className={styles.privacyToggleText}>
-          <span className={styles.privacyToggleTitle}>
-            {isPrivate ? "🔒 Finis privado" : "🌐 Finis público"}
-          </span>
-          <span className={styles.privacyToggleDesc}>
-            {isPrivate
-              ? "Somente você verá este Finis no seu perfil"
-              : "Visível para quem acessar seu perfil"}
-          </span>
-        </div>
-      </label>
+      <button
+        type="button"
+        className={styles.privacyToggle}
+        onClick={() => setIsPrivate((prev) => !prev)}
+        aria-pressed={isPrivate}
+        aria-label={isPrivate ? "Finis privado" : "Finis público"}
+      >
+        <Icon name={isPrivate ? "eyeOff" : "eye"} size={18} />
+        <span>{isPrivate ? "Privado" : "Público"}</span>
+      </button>
 
       {errorMessage && (
         <p className={styles.errorMessage} role="alert">

@@ -1,9 +1,11 @@
 .avatar {
   display: inline-flex;
-  border-radius: 50%;
   overflow: hidden;
   background-color: var(--color-surface-muted);
   flex-shrink: 0;
+  box-shadow:
+    0 4px 10px rgba(27, 26, 23, 0.22),
+    0 14px 32px rgba(27, 26, 23, 0.32);
 }
 
 .avatar img {
@@ -25,12 +27,15 @@
 }
 
 .ring {
-  box-shadow: 0 0 0 3px var(--color-surface), 0 0 0 5px var(--color-primary);
+  box-shadow:
+    0 0 0 3px var(--color-surface),
+    0 0 0 5px var(--color-primary);
 }
 
 .sizeSm {
   width: 32px;
   height: 32px;
+  border-radius: 8px;
 }
 
 .sizeSm .initial {
@@ -40,6 +45,7 @@
 .sizeMd {
   width: 44px;
   height: 44px;
+  border-radius: 10px;
 }
 
 .sizeMd .initial {
@@ -49,6 +55,7 @@
 .sizeLg {
   width: 72px;
   height: 72px;
+  border-radius: 16px;
 }
 
 .sizeLg .initial {
@@ -58,6 +65,7 @@
 .sizeXl {
   width: 112px;
   height: 112px;
+  border-radius: 24px;
 }
 
 .sizeXl .initial {

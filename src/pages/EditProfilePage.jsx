@@ -33,7 +33,6 @@ function EditProfilePage() {
   const [profile, setProfile] = useState(null);
   const [username, setUsername] = useState("");
   const [description, setDescription] = useState("");
-  const [isPrivate, setIsPrivate] = useState(false);
   const [mediaPreferences, setMediaPreferences] = useState(
     MEDIA_CATEGORIES.map((c) => c.id),
   );
@@ -55,7 +54,6 @@ function EditProfilePage() {
           setProfile(data);
           setUsername(data.username ?? "");
           setDescription(data.description ?? "");
-          setIsPrivate(data.isPrivate ?? false);
           setMediaPreferences(
             Array.isArray(data.mediaPreferences) &&
               data.mediaPreferences.length > 0
@@ -122,7 +120,6 @@ function EditProfilePage() {
         username: normalizedUsername,
         description: description.trim() || null,
         mediaPreferences: prefsToSave,
-        isPrivate,
       });
       let nextProfile = updatedProfile;
 
@@ -188,7 +185,7 @@ function EditProfilePage() {
       </div>
 
       <section className={styles.avatarSection}>
-        <Avatar src={avatarUrl} alt={displayName} size="xl" ring />
+        <Avatar src={avatarUrl} alt={displayName} size="xl" />
         <div className={styles.field}>
           <label htmlFor="avatar">Foto de perfil</label>
           <input
@@ -306,55 +303,6 @@ function EditProfilePage() {
             );
           })}
         </ul>
-      </fieldset>
-
-      <fieldset className={styles.privacyField}>
-        <legend
-          className={styles.privacyOptionTitle}
-          style={{ marginBottom: 8 }}
-        >
-          Visibilidade do perfil
-        </legend>
-        <div className={styles.privacyOptions}>
-          <div className={styles.privacyOption}>
-            <input
-              type="radio"
-              id="privacy-public"
-              name="profilePrivacy"
-              value="false"
-              checked={!isPrivate}
-              onChange={() => setIsPrivate(false)}
-            />
-            <label
-              htmlFor="privacy-public"
-              className={styles.privacyOptionLabel}
-            >
-              <span className={styles.privacyOptionTitle}>🌐 Público</span>
-              <span className={styles.privacyOptionDesc}>
-                Qualquer pessoa pode ver seu perfil
-              </span>
-            </label>
-          </div>
-          <div className={styles.privacyOption}>
-            <input
-              type="radio"
-              id="privacy-private"
-              name="profilePrivacy"
-              value="true"
-              checked={isPrivate}
-              onChange={() => setIsPrivate(true)}
-            />
-            <label
-              htmlFor="privacy-private"
-              className={styles.privacyOptionLabel}
-            >
-              <span className={styles.privacyOptionTitle}>🔒 Privado</span>
-              <span className={styles.privacyOptionDesc}>
-                Somente você vê seu perfil
-              </span>
-            </label>
-          </div>
-        </div>
       </fieldset>
 
       <div className={styles.feedback} aria-live="polite">

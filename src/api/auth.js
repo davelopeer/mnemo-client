@@ -10,7 +10,6 @@ export function signup(payload, avatarFile) {
   body.append("password", payload.password);
   body.append("age", String(payload.age));
   body.append("username", payload.username);
-  body.append("isPrivate", String(payload.isPrivate ?? false));
   if (payload.phone) {
     body.append("phone", payload.phone);
   }

@@ -21,7 +21,7 @@ function ProfileHeader({
   return (
     <section className={styles.wrapper}>
       <div className={styles.content}>
-        <Avatar src={user.avatarUrl} alt={user.name} size="xl" ring />
+        <Avatar src={user.avatarUrl} alt={user.name} size="xl" />
         <div className={styles.info}>
           <h1 className={styles.name}>{user.name}</h1>
           <span className={styles.nickname}>{user.nickname}</span>
@@ -56,11 +56,6 @@ function ProfileHeader({
         </div>
 
         <div className={styles.actions}>
-          {!isOwnProfile ? (
-            <Button variant="outline" iconLeft={<Icon name="mail" size={16} />}>
-              Mensagem
-            </Button>
-          ) : null}
           {isOwnProfile ? (
             <Button
               type="button"

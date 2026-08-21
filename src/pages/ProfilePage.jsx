@@ -14,7 +14,6 @@ import styles from "./ProfilePage.module.css";
 const profileTabs = [
   { id: "posts", label: "Finis" },
   { id: "about", label: "Sobre" },
-  { id: "collections", label: "Coleções" },
 ];
 
 function profileToUser(profile, fallbackUser) {
@@ -67,12 +66,6 @@ function ProfilePage() {
           }
 
           setProfile(profileData);
-
-          if (profileData.isPrivate) {
-            setReviews([]);
-            setStatus("success");
-            return;
-          }
 
           const reviewsData = await reviewsApi.getProfileReviews(username);
           if (isMounted) {
@@ -227,14 +220,9 @@ function ProfilePage() {
         : [...prev, categoryId],
     );
   };
-  const pageClassName = `${styles.page} ${username ? styles.publicPage : ""}`;
-
   if (status === "loading") {
     return (
-      <section
-        className={`${styles.emptyState} ${username ? styles.publicPage : ""}`}
-        aria-live="polite"
-      >
+      <section className={styles.emptyState} aria-live="polite">
         <h3>Carregando perfil...</h3>
         <p>Estamos buscando as informações mais recentes.</p>
       </section>
@@ -243,10 +231,7 @@ function ProfilePage() {
 
   if (status === "error") {
     return (
-      <section
-        className={`${styles.emptyState} ${username ? styles.publicPage : ""}`}
-        aria-live="assertive"
-      >
+      <section className={styles.emptyState} aria-live="assertive">
         <h3>
           {username
             ? "Perfil não encontrado."
@@ -257,24 +242,8 @@ function ProfilePage() {
     );
   }
 
-  if (username && profile?.isPrivate) {
-    return (
-      <div className={`${styles.publicPage}`}>
-        <div className={styles.privateProfile}>
-          <img
-            src="/vaso-san.png"
-            alt="Perfil privado"
-            className={styles.privateProfileImage}
-          />
-          <h2>Este perfil é privado</h2>
-          <p>O usuário escolheu manter seu perfil fora do alcance público.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className={pageClassName}>
+    <div className={styles.page}>
       <ProfileHeader
         user={pageUser}
         isOwnProfile={isOwnProfile}
@@ -350,15 +319,6 @@ function ProfilePage() {
             <h3>Bio</h3>
             <p>{pageUser.bio}</p>
           </article>
-        </section>
-      )}
-
-      {activeTab === "collections" && (
-        <section className={styles.emptyState}>
-          <h3>Coleções chegam em breve.</h3>
-          <p>
-            Você poderá agrupar reviews em temas — tipo “cyberpunk dos anos 80”.
-          </p>
         </section>
       )}
 

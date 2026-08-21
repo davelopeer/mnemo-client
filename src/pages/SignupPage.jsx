@@ -34,7 +34,6 @@ function SignupPage() {
     phone: "",
     age: "",
     username: "",
-    isPrivate: false,
   });
   const [avatarFile, setAvatarFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
@@ -56,8 +55,7 @@ function SignupPage() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    const parsed = name === "isPrivate" ? value === "true" : value;
-    setFormData((current) => ({ ...current, [name]: parsed }));
+    setFormData((current) => ({ ...current, [name]: value }));
     if (name === "username") {
       setUsernameError("");
     }
@@ -208,12 +206,7 @@ function SignupPage() {
           </label>
 
           <section className={styles.avatarSection}>
-            <Avatar
-              src={previewUrl}
-              alt="Prévia da foto de perfil"
-              size="lg"
-              ring
-            />
+            <Avatar src={previewUrl} alt="Prévia da foto de perfil" size="lg" />
             <label className={styles.field} htmlFor="avatar">
               <span>Foto de perfil</span>
               <input
@@ -230,54 +223,6 @@ function SignupPage() {
               ) : null}
             </label>
           </section>
-
-          <div
-            className={styles.privacyField}
-            role="group"
-            aria-labelledby="privacy-label"
-          >
-            <span id="privacy-label">Visibilidade do perfil</span>
-            <div className={styles.privacyOptions}>
-              <div className={styles.privacyOption}>
-                <input
-                  type="radio"
-                  id="privacy-public"
-                  name="isPrivate"
-                  value="false"
-                  checked={!formData.isPrivate}
-                  onChange={handleChange}
-                />
-                <label
-                  htmlFor="privacy-public"
-                  className={styles.privacyOptionLabel}
-                >
-                  <span className={styles.privacyOptionTitle}>🌐 Público</span>
-                  <span className={styles.privacyOptionDesc}>
-                    Qualquer pessoa pode ver seu perfil
-                  </span>
-                </label>
-              </div>
-              <div className={styles.privacyOption}>
-                <input
-                  type="radio"
-                  id="privacy-private"
-                  name="isPrivate"
-                  value="true"
-                  checked={formData.isPrivate}
-                  onChange={handleChange}
-                />
-                <label
-                  htmlFor="privacy-private"
-                  className={styles.privacyOptionLabel}
-                >
-                  <span className={styles.privacyOptionTitle}>🔒 Privado</span>
-                  <span className={styles.privacyOptionDesc}>
-                    Somente você vê seu perfil
-                  </span>
-                </label>
-              </div>
-            </div>
-          </div>
 
           <div className={styles.fieldGrid}>
             <label className={styles.field}>
