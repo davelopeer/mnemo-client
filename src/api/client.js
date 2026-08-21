@@ -1,8 +1,10 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
+).replace(/\/+$/, "");
 
-export async function apiRequest(path, { method = 'GET', body, token } = {}) {
+export async function apiRequest(path, { method = "GET", body, token } = {}) {
   const isFormData = body instanceof FormData;
-  const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
+  const headers = isFormData ? {} : { "Content-Type": "application/json" };
 
   if (token) {
     headers.Authorization = `Bearer ${token}`;
@@ -11,7 +13,7 @@ export async function apiRequest(path, { method = 'GET', body, token } = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method,
     headers,
-    body: body ? (isFormData ? body : JSON.stringify(body)) : undefined
+    body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
   });
 
   if (response.status === 204) {
@@ -20,7 +22,8 @@ export async function apiRequest(path, { method = 'GET', body, token } = {}) {
 
   const data = await response.json().catch(() => null);
   if (!response.ok) {
-    const message = data?.error?.message ?? 'Nao foi possivel concluir a solicitacao';
+    const message =
+      data?.error?.message ?? "Nao foi possivel concluir a solicitacao";
     throw new Error(message);
   }
 
@@ -28,7 +31,7 @@ export async function apiRequest(path, { method = 'GET', body, token } = {}) {
 }
 
 export function resolveApiAssetUrl(path, cacheKey) {
-  if (!path || path.startsWith('http://') || path.startsWith('https://')) {
+  if (!path || path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
 
@@ -37,6 +40,6 @@ export function resolveApiAssetUrl(path, cacheKey) {
     return url;
   }
 
-  const separator = url.includes('?') ? '&' : '?';
+  const separator = url.includes("?") ? "&" : "?";
   return `${url}${separator}v=${encodeURIComponent(cacheKey)}`;
 }
