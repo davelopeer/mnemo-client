@@ -8,7 +8,7 @@ import ProfileHeader from "../components/profile/ProfileHeader.jsx";
 import PostCard from "../components/feed/PostCard.jsx";
 import ReviewForm from "../components/review/ReviewForm.jsx";
 import { currentUser, MEDIA_CATEGORIES } from "../data/mockData.js";
-import { reviewToPost } from "../utils/reviewPost.js";
+import { reviewToPost, sortPostsByFinishedAt } from "../utils/reviewPost.js";
 import styles from "./ProfilePage.module.css";
 
 const profileTabs = [
@@ -69,7 +69,11 @@ function ProfilePage() {
 
           const reviewsData = await reviewsApi.getProfileReviews(username);
           if (isMounted) {
-            setReviews((reviewsData.items ?? []).map(reviewToPost));
+            setReviews(
+              sortPostsByFinishedAt(
+                (reviewsData.items ?? []).map(reviewToPost),
+              ),
+            );
             setStatus("success");
           }
           return;
@@ -82,7 +86,9 @@ function ProfilePage() {
 
         if (isMounted) {
           setProfile(profileData);
-          setReviews((reviewsData.items ?? []).map(reviewToPost));
+          setReviews(
+            sortPostsByFinishedAt((reviewsData.items ?? []).map(reviewToPost)),
+          );
           setStatus("success");
         }
       } catch (error) {
@@ -149,8 +155,10 @@ function ProfilePage() {
       );
       const updatedPost = reviewToPost(updated);
       setReviews((previous) =>
-        previous.map((item) =>
-          item.id === updatedPost.id ? updatedPost : item,
+        sortPostsByFinishedAt(
+          previous.map((item) =>
+            item.id === updatedPost.id ? updatedPost : item,
+          ),
         ),
       );
       setEditingPost(null);

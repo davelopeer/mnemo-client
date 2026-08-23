@@ -3,7 +3,10 @@ import Button from "../ui/Button.jsx";
 import Icon from "../ui/Icon.jsx";
 import StarRating from "../ui/StarRating.jsx";
 import { MEDIA_CATEGORIES } from "../../data/mockData.js";
+import { todayISODate } from "../../utils/reviewPost.js";
 import styles from "./ReviewForm.module.css";
+
+export const MAX_REVIEW_DESCRIPTION_LENGTH = 1902;
 
 function ReviewForm({
   onSubmit,
@@ -37,9 +40,22 @@ function ReviewForm({
     return availableCategories[0].id;
   });
   const [rating, setRating] = useState(initialValues?.rating ?? 0);
+  const [description, setDescription] = useState(
+    initialValues?.description ?? "",
+  );
+  const [finishedAt, setFinishedAt] = useState(
+    initialValues?.finishedAt || todayISODate(),
+  );
   const [isPrivate, setIsPrivate] = useState(initialValues?.isPrivate ?? false);
 
-  const canSubmit = title.trim().length > 0 && rating > 0 && !isSubmitting;
+  const descriptionLength = [...description].length;
+  const remainingCharacters = MAX_REVIEW_DESCRIPTION_LENGTH - descriptionLength;
+  const canSubmit =
+    title.trim().length > 0 &&
+    rating > 0 &&
+    finishedAt &&
+    remainingCharacters >= 0 &&
+    !isSubmitting;
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -50,6 +66,8 @@ function ReviewForm({
       mediaYear: mediaYear.trim(),
       category,
       rating,
+      description,
+      finishedAt,
       isPrivate,
     });
   };
@@ -123,12 +141,41 @@ function ReviewForm({
       </div>
 
       <div className={styles.field}>
+        <label htmlFor="review-finished-at">Data de término</label>
+        <input
+          id="review-finished-at"
+          className={styles.input}
+          type="date"
+          value={finishedAt}
+          onChange={(event) => setFinishedAt(event.target.value)}
+        />
+      </div>
+
+      <div className={styles.field}>
         <label>Nota</label>
         <div className={styles.ratingRow}>
           <StarRating value={rating} onChange={setRating} size="lg" />
           {rating > 0 && (
             <span className={styles.ratingLabel}>{rating} / 5</span>
           )}
+        </div>
+      </div>
+
+      <div className={styles.field}>
+        <label htmlFor="review-description">Descrição / opinião</label>
+        <textarea
+          id="review-description"
+          className={styles.textarea}
+          rows={6}
+          maxLength={MAX_REVIEW_DESCRIPTION_LENGTH}
+          placeholder="O que você achou desta obra?"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+        />
+        <div
+          className={`${styles.counter} ${remainingCharacters < 0 ? styles.counterOver : ""}`}
+        >
+          {remainingCharacters} caracteres restantes
         </div>
       </div>
 

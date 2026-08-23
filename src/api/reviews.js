@@ -10,7 +10,12 @@ export function createReview(token, payload) {
   body.append("mediaYear", payload.mediaYear ? String(payload.mediaYear) : "");
   body.append("category", payload.category);
   body.append("rating", String(payload.rating));
+  body.append("description", payload.description ?? "");
   body.append("isPrivate", String(payload.isPrivate ?? false));
+
+  if (payload.finishedAt) {
+    body.append("finishedAt", payload.finishedAt);
+  }
 
   if (payload.mediaSubtitle) {
     body.append("mediaSubtitle", payload.mediaSubtitle);
@@ -30,7 +35,12 @@ export function updateReview(token, id, payload) {
   body.append("mediaYear", payload.mediaYear ? String(payload.mediaYear) : "");
   body.append("category", payload.category);
   body.append("rating", String(payload.rating));
+  body.append("description", payload.description ?? "");
   body.append("isPrivate", String(payload.isPrivate ?? false));
+
+  if (payload.finishedAt) {
+    body.append("finishedAt", payload.finishedAt);
+  }
 
   if (payload.mediaSubtitle) {
     body.append("mediaSubtitle", payload.mediaSubtitle);

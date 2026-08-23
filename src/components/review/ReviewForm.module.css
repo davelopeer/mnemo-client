@@ -46,7 +46,8 @@
   letter-spacing: 0.08em;
 }
 
-.input {
+.input,
+.textarea {
   background-color: var(--color-surface);
   border: 1px solid var(--color-ink-100);
   border-radius: var(--radius-md);
@@ -57,10 +58,29 @@
     box-shadow var(--transition-fast);
 }
 
-.input:focus {
+.input:focus,
+.textarea:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 4px var(--color-primary-tint);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 140px;
+  max-height: 280px;
+  line-height: 1.6;
+}
+
+.counter {
+  font-size: 12px;
+  color: var(--color-ink-500);
+  text-align: right;
+}
+
+.counterOver {
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 .ratingRow {

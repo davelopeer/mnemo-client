@@ -195,23 +195,31 @@
 .pillars {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-4);
-  max-width: 640px;
+  gap: var(--spacing-3);
+  max-width: 720px;
   margin-top: var(--spacing-6);
 }
 
+.pillar {
+  padding: 16px 14px;
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: var(--shadow-sm);
+}
+
 .pillars p {
-  font-size: 13px;
-  color: rgba(239, 232, 220, 0.75);
+  font-size: 14px;
+  color: rgba(239, 232, 220, 0.92);
   line-height: 1.5;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 .pillarLabel {
   font-family: var(--font-heading);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: #fff;
 }
 

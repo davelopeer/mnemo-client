@@ -115,10 +115,10 @@ function Sidebar() {
           <strong>Memória</strong> do que você consumiu.
         </p>
         <p>
-          <strong>Descoberta</strong> de novas obras.
+          <strong>Compartilhe</strong> o que vale recomendar.
         </p>
         <p>
-          <strong>Registro</strong> do que importa para você.
+          <strong>Descoberta</strong> de novas obras.
         </p>
       </footer>
     </aside>
